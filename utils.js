@@ -1,3 +1,5 @@
+'use strict';
+
 function µ(id, elem) {
   var ret;
   var root = ((elem) ? elem : document);
@@ -275,9 +277,7 @@ function map(val, inMin, inMax, outMin, outMax) {
 }
 
 function clamp(val, Min, Max) {
-  with (Math) {
-    return max(Min, min(val, Max));
-  }
+  return Math.max(Min, min(val, Max));
 }
 
 function sign(x) {
