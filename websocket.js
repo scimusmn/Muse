@@ -1,7 +1,6 @@
-include([], function() {
-
   var websocket = function() {
-    this.address = 'ws://' + window.location.host + '/';
+    console.log(window.location.host.substring(0, window.location.host.lastIndexOf(':')));
+    this.address = 'ws://' + window.location.host.substring(0, window.location.host.lastIndexOf(':')) + ':8080/';
     this.connectInterval = null;
     this.serialport = '';
     var ws = null;
@@ -43,5 +42,4 @@ include([], function() {
     };
   };
 
-  window.wsClient = new websocket();
-});
+window.wsClient = new websocket();

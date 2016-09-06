@@ -1,3 +1,5 @@
+'use strict';
+
 function µ(id, elem) {
   var ret;
   var root = ((elem) ? elem : document);
@@ -10,8 +12,21 @@ function µ(id, elem) {
       ret = document.createElement(spl[0].substring(1));
       if (elem) elem.appendChild(ret);
       break;
-    default:
+    case '#':
       ret = root.querySelector(spl[0]);
+      break;
+    default:
+      ret = root.querySelectorAll(spl[0]);
+      ret.forEach = function(cb) {
+        for (let i = 0; i < ret.length; i++) {
+          cb(i, ret[i]);
+        }
+      };
+      ret.style = function(mem,val) {
+        for (let i = 0; i < ret.length; i++) {
+          ret[i].style[mem] = val;
+        }
+      }
       break;
   }
   if (spl.length <= 1) return ret;
@@ -262,9 +277,7 @@ function map(val, inMin, inMax, outMin, outMax) {
 }
 
 function clamp(val, Min, Max) {
-  with (Math) {
-    return max(Min, min(val, Max));
-  }
+  return Math.max(Min, min(val, Max));
 }
 
 function sign(x) {
@@ -275,6 +288,25 @@ function zeroPad(num, size) {
   var s = num + '';
   while (s.length < size) s = '0' + s;
   return s;
+}
+
+function position(elem) {
+  var offset = { x:0, y:0 };
+  while (elem)
+  {
+    offset.x += elem.offsetLeft;
+    offset.y += elem.offsetTop;
+    elem = elem.offsetParent;
+  }
+
+  return offset;
+}
+
+function extractNumber(value)
+{
+  var n = parseInt(value);
+
+  return n == null || isNaN(n) ? 0 : n;
 }
 
 // Reduce a fraction by finding the Greatest Common Divisor and dividing by it.
