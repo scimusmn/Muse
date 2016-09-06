@@ -2,10 +2,12 @@
   var serial = function() {
     var _this = this;
     this.port = '';
+    _this.ports = null;
     this.connectionId = null;
 
-    this.connect = function(partialName, cb) {
+    this.connect = function(partialName, cb, noPortCB) {
       chrome.serial.getDevices(function(ports) {
+        _this.ports = ports;
         var found = false;
         for (var i = 0; i < ports.length; i++) {
           console.log(ports[i].path);
@@ -22,7 +24,7 @@
         }
 
         if (!found) {
-          console.log(partialName + ' not found, select port');
+          /*console.log(partialName + ' not found, select port');
           var body = document.querySelector('body');
           var selector = document.createElement('div');
           selector.className = 'comSelect';
@@ -46,7 +48,8 @@
             });
 
             selector.style.display = 'none';
-          };
+          };*/
+          if (noPortCB) noPortCB(ports);
         }
 
       });
@@ -488,12 +491,16 @@
       this.onConnect();
     };
 
+    this.begin = function(noPortCB) {
+      this.serial.connect(_this.port, _this.serialOpenCB.bind(_this),noPortCB);
+    }
+
     this.createdCallback = function() {
       var _this = this;
       this.port = this.getAttribute('serialport');
       this.serial = new serial();
       this.serial.messageCallback = _this.onMessage.bind(_this);
-      this.serial.connect(_this.port, _this.serialOpenCB.bind(_this));
+
 
       //this.ws.connect();
     };
