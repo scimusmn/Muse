@@ -38,7 +38,8 @@
             drop.add(opt);
           }
 
-          sel.onclick = function() {
+          sel.onmousedown = function() {
+            console.log('clicked select');
             _this.port = drop.value;
             chrome.serial.connect(_this.port, { bitrate: 115200 }, function(info) {
               _this.connectionId = info.connectionId;
@@ -57,7 +58,8 @@
     var stringReceived = '';
 
     this.write = function(str) {
-      chrome.serial.send(_this.connectionId, convertStringToArrayBuffer(str + '\n'), function() {});
+      if (_this.connectionId)
+        chrome.serial.send(_this.connectionId, convertStringToArrayBuffer(str + '\n'), function() {});
     };
 
     // Convert string to ArrayBuffer
@@ -310,11 +312,13 @@
     this.digitalWrite = function(pin, state) {
       if (pin <= 15) this.serial.write(asChar(START + DIGI_WRITE + ((pin & 15) << 1) + (state & 1)));
       else if (pin <= 19) this.serial.write(asChar(START + DIGI_WRITE_2 + ((pin - 16) << 1) + (state & 1)));
+      console.log('digital write' + (START + DIGI_WRITE_2 + ((pin - 16) << 1) + (state & 1)));
 
       //else console.log('Pin must be less than or equal to 13');
     };
 
     this.digitalRead = function(pin) {
+      console.log('digitalread ' + (START + DIGI_READ + (pin & 31)));
       this.serial.write(asChar(START + DIGI_READ + (pin & 31)));
     };
 
