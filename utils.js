@@ -17,34 +17,19 @@ window.µ = function(id, elem) {
       break;
     default:
       ret = root.querySelectorAll(spl[0]);
-<<<<<<< HEAD
       if(ret.length==1) ret = ret[0];
       else{
-=======
-      if (ret.length > 1) {
->>>>>>> f30ade711b9a58dce3e301056bc24885d54f96ad
         ret.forEach = function(cb) {
           for (let i = 0; i < ret.length; i++) {
             cb(i, ret[i]);
           }
         };
-<<<<<<< HEAD
         ret.style = function(mem,val) {
           for (let i = 0; i < ret.length; i++) {
             ret[i].style[mem] = val;
           }
         }
       }
-=======
-
-        ret.style = function(mem, val) {
-          for (let i = 0; i < ret.length; i++) {
-            ret[i].style[mem] = val;
-          }
-        };
-      } else ret = ret[0];
-
->>>>>>> f30ade711b9a58dce3e301056bc24885d54f96ad
       break;
   }
   if (spl.length <= 1) return ret;
