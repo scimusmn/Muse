@@ -1,6 +1,6 @@
 'use strict';
 
-function µ(id, elem) {
+window.µ = function(id, elem) {
   var ret;
   var root = ((elem) ? elem : document);
   var spl = id.split('>');
@@ -17,26 +17,41 @@ function µ(id, elem) {
       break;
     default:
       ret = root.querySelectorAll(spl[0]);
+<<<<<<< HEAD
       if(ret.length==1) ret = ret[0];
       else{
+=======
+      if (ret.length > 1) {
+>>>>>>> f30ade711b9a58dce3e301056bc24885d54f96ad
         ret.forEach = function(cb) {
           for (let i = 0; i < ret.length; i++) {
             cb(i, ret[i]);
           }
         };
+<<<<<<< HEAD
         ret.style = function(mem,val) {
           for (let i = 0; i < ret.length; i++) {
             ret[i].style[mem] = val;
           }
         }
       }
+=======
+
+        ret.style = function(mem, val) {
+          for (let i = 0; i < ret.length; i++) {
+            ret[i].style[mem] = val;
+          }
+        };
+      } else ret = ret[0];
+
+>>>>>>> f30ade711b9a58dce3e301056bc24885d54f96ad
       break;
   }
   if (spl.length <= 1) return ret;
   else return ret.getAttribute(spl[1]);
 };
 
-function inheritFrom(parent, addMethods) {
+window.inheritFrom = function(parent, addMethods) {
   var _parent = parent;
   var ret = function() {
     if (_parent) {
@@ -60,7 +75,7 @@ function inheritFrom(parent, addMethods) {
     addMethods.call(ret.prototype);
 
   return ret;
-}
+};
 
 Function.prototype.inherits = function(parent) {
   this.prototype = Object.create(parent && parent.prototype, {
@@ -91,6 +106,36 @@ function ajax(src, fxn) {
 
   return ret;
 }
+
+window.get = function(url) {
+  // Return a new promise.
+  return new Promise(function(resolve, reject) {
+    // Do the usual XHR stuff
+    var req = new XMLHttpRequest();
+    req.open('GET', url);
+
+    req.onload = function() {
+      // This is called even on 404 etc
+      // so check the status
+      if (req.status == 200) {
+        // Resolve the promise with the response text
+        resolve(req.response);
+      } else {
+        // Otherwise reject with the status text
+        // which will hopefully be a meaningful error
+        reject(Error(req.statusText));
+      }
+    };
+
+    // Handle network errors
+    req.onerror = function() {
+      reject(Error('Network Error'));
+    };
+
+    // Make the request
+    req.send();
+  });
+};
 
 function loadFile(src, Fxn) {
   var _this = this;

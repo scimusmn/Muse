@@ -26,7 +26,7 @@ var includeManager = new function() {
       dep = this.includes[src].dependents;
     }
 
-    this.includes[src] = {src:src, srcs:srcs, loadFxn:loadFxn, done:false, dependents:dep};
+    this.includes[src] = { src:src, srcs:srcs, loadFxn:loadFxn, done:false, dependents:dep };
   };
 
   this.addDependent = function(src, which) {
@@ -37,7 +37,7 @@ var includeManager = new function() {
     if (this.includes.indexOf(src) >= 0) {
       dep = this.includes[src].dependents;
       done = this.includes[src].done;
-    } else this.includes[src] = {src:src, done:false, dependents:dep};
+    } else this.includes[src] = { src:src, done:false, dependents:dep };
     if (dep.indexOf(src) == -1) dep.push(which);
     this.includes[src].dependents = dep;
   };
@@ -120,7 +120,7 @@ function include(srcLocations, onLoaded) {
       var src = includeManager.shorten(srcLocations[i]);
       scrpt.src = src;
       scrpt.addEventListener('load', loaded, false);
-      includeManager.includes[src] = {src:src, loading:true, dependents:[]};
+      includeManager.includes[src] = { src:src, loading:true, dependents:[] };
       document.head.insertBefore(scrpt, document.currentScript);
     }
 
