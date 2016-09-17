@@ -17,14 +17,17 @@ function µ(id, elem) {
       break;
     default:
       ret = root.querySelectorAll(spl[0]);
-      ret.forEach = function(cb) {
-        for (let i = 0; i < ret.length; i++) {
-          cb(i, ret[i]);
-        }
-      };
-      ret.style = function(mem,val) {
-        for (let i = 0; i < ret.length; i++) {
-          ret[i].style[mem] = val;
+      if(ret.length==1) ret = ret[0];
+      else{
+        ret.forEach = function(cb) {
+          for (let i = 0; i < ret.length; i++) {
+            cb(i, ret[i]);
+          }
+        };
+        ret.style = function(mem,val) {
+          for (let i = 0; i < ret.length; i++) {
+            ret[i].style[mem] = val;
+          }
         }
       }
       break;
