@@ -24,31 +24,6 @@
         }
 
         if (!found) {
-          /*console.log(partialName + ' not found, select port');
-          var body = document.querySelector('body');
-          var selector = document.createElement('div');
-          selector.className = 'comSelect';
-          body.appendChild(selector);
-          var drop = document.createElement('select');
-          selector.appendChild(drop);
-          var sel = document.createElement('button');
-          selector.appendChild(sel);
-          sel.textContent = 'Choose';
-          for (var i = 0; i < ports.length; i++) {
-            var opt = document.createElement('option');
-            opt.text = ports[i].path;
-            drop.add(opt);
-          }
-
-          sel.onclick = function() {
-            _this.port = drop.value;
-            chrome.serial.connect(_this.port, { bitrate: 115200 }, function(info) {
-              _this.connectionId = info.connectionId;
-              setTimeout(cb, 2000);
-            });
-
-            selector.style.display = 'none';
-          };*/
           if (noPortCB) noPortCB(ports);
         }
 
@@ -492,15 +467,14 @@
     };
 
     this.begin = function(noPortCB) {
-      this.serial.connect(_this.port, _this.serialOpenCB.bind(_this),noPortCB);
-    }
+      this.serial.connect(_this.port, _this.serialOpenCB.bind(_this), noPortCB);
+    };
 
     this.createdCallback = function() {
       var _this = this;
       this.port = this.getAttribute('serialport');
       this.serial = new serial();
       this.serial.messageCallback = _this.onMessage.bind(_this);
-
 
       //this.ws.connect();
     };
