@@ -17,8 +17,8 @@ window.µ = function(id, elem) {
       break;
     default:
       ret = root.querySelectorAll(spl[0]);
-      if(ret.length==1) ret = ret[0];
-      else{
+      //if(ret.length==1) ret = ret[0];
+      //else{
         ret.forEach = function(cb) {
           for (let i = 0; i < ret.length; i++) {
             cb(i, ret[i]);
@@ -29,7 +29,7 @@ window.µ = function(id, elem) {
             ret[i].style[mem] = val;
           }
         }
-      }
+      //}
       break;
   }
   if (spl.length <= 1) return ret;
