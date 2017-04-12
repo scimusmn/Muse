@@ -1,4 +1,6 @@
-function µ(id, elem) {
+'use strict';
+
+window.µ = function(id, elem) {
   var ret;
   var root = ((elem) ? elem : document);
   var spl = id.split('>');
@@ -10,15 +12,34 @@ function µ(id, elem) {
       ret = document.createElement(spl[0].substring(1));
       if (elem) elem.appendChild(ret);
       break;
-    default:
+    case '#':
       ret = root.querySelector(spl[0]);
+      break;
+    default:
+      ret = root.querySelectorAll(spl[0]);
+
+      //if(ret.length==1) ret = ret[0];
+      //else{
+      ret.forEach = function(cb) {
+          for (let i = 0; i < ret.length; i++) {
+            cb(i, ret[i]);
+          }
+        };
+
+      ret.style = function(mem, val) {
+          for (let i = 0; i < ret.length; i++) {
+            ret[i].style[mem] = val;
+          }
+        };
+
+      //}
       break;
   }
   if (spl.length <= 1) return ret;
   else return ret.getAttribute(spl[1]);
 };
 
-function inheritFrom(parent, addMethods) {
+window.inheritFrom = function(parent, addMethods) {
   var _parent = parent;
   var ret = function() {
     if (_parent) {
@@ -42,7 +63,7 @@ function inheritFrom(parent, addMethods) {
     addMethods.call(ret.prototype);
 
   return ret;
-}
+};
 
 Function.prototype.inherits = function(parent) {
   this.prototype = Object.create(parent && parent.prototype, {
@@ -73,6 +94,67 @@ function ajax(src, fxn) {
 
   return ret;
 }
+
+window.get = function(url) {
+  // Return a new promise.
+  return new Promise(function(resolve, reject) {
+    // Do the usual XHR stuff
+    var req = new XMLHttpRequest();
+    req.open('GET', url);
+
+    req.onload = function() {
+      // This is called even on 404 etc
+      // so check the status
+      if (req.status == 200) {
+        // Resolve the promise with the response text
+        resolve(req.response);
+      } else {
+        // Otherwise reject with the status text
+        // which will hopefully be a meaningful error
+        reject(Error(req.statusText));
+      }
+    };
+
+    // Handle network errors
+    req.onerror = function() {
+      reject(Error('Network Error'));
+    };
+
+    // Make the request
+    req.send();
+  });
+};
+
+window.post = function(url, obj) {
+  // Return a new promise.
+  return new Promise(function(resolve, reject) {
+    // Do the usual XHR stuff
+    var req = new XMLHttpRequest();
+    req.open('POST', url);
+    req.setRequestHeader('Content-type', 'application/json');
+
+    req.onload = function() {
+      // This is called even on 404 etc
+      // so check the status
+      if (req.status == 200) {
+        // Resolve the promise with the response text
+        resolve(req.response);
+      } else {
+        // Otherwise reject with the status text
+        // which will hopefully be a meaningful error
+        reject(Error(req.statusText));
+      }
+    };
+
+    // Handle network errors
+    req.onerror = function() {
+      reject(Error('Network Error'));
+    };
+
+    // Make the request
+    req.send(JSON.stringify(obj));
+  });
+};
 
 function loadFile(src, Fxn) {
   var _this = this;
@@ -262,9 +344,7 @@ function map(val, inMin, inMax, outMin, outMax) {
 }
 
 function clamp(val, Min, Max) {
-  with (Math) {
-    return max(Min, min(val, Max));
-  }
+  return Math.max(Min, min(val, Max));
 }
 
 function sign(x) {
@@ -275,6 +355,25 @@ function zeroPad(num, size) {
   var s = num + '';
   while (s.length < size) s = '0' + s;
   return s;
+}
+
+function position(elem) {
+  var offset = { x:0, y:0 };
+  while (elem)
+  {
+    offset.x += elem.offsetLeft;
+    offset.y += elem.offsetTop;
+    elem = elem.offsetParent;
+  }
+
+  return offset;
+}
+
+function extractNumber(value)
+{
+  var n = parseInt(value);
+
+  return n == null || isNaN(n) ? 0 : n;
 }
 
 // Reduce a fraction by finding the Greatest Common Divisor and dividing by it.

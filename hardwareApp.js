@@ -2,16 +2,19 @@
   var serial = function() {
     var _this = this;
     this.port = '';
+    _this.ports = null;
     this.connectionId = null;
 
-    this.connect = function(partialName, cb) {
+    this.connect = function(partialName, cb, noPortCB) {
       chrome.serial.getDevices(function(ports) {
+        _this.ports = ports;
         var found = false;
         for (var i = 0; i < ports.length; i++) {
           console.log(ports[i].path);
           if (ports[i].path.indexOf(partialName) > -1) {
             _this.port = ports[i].path;
             found = true;
+            if (noPortCB) noPortCB(ports);
             chrome.serial.connect(_this.port, { bitrate: 115200 }, function(info) {
               _this.connectionId = info.connectionId;
               setTimeout(cb, 2000);
@@ -22,31 +25,7 @@
         }
 
         if (!found) {
-          console.log(partialName + ' not found, select port');
-          var body = document.querySelector('body');
-          var selector = document.createElement('div');
-          selector.className = 'comSelect';
-          body.appendChild(selector);
-          var drop = document.createElement('select');
-          selector.appendChild(drop);
-          var sel = document.createElement('button');
-          selector.appendChild(sel);
-          sel.textContent = 'Choose';
-          for (var i = 0; i < ports.length; i++) {
-            var opt = document.createElement('option');
-            opt.text = ports[i].path;
-            drop.add(opt);
-          }
-
-          sel.onclick = function() {
-            _this.port = drop.value;
-            chrome.serial.connect(_this.port, { bitrate: 115200 }, function(info) {
-              _this.connectionId = info.connectionId;
-              setTimeout(cb, 2000);
-            });
-
-            selector.style.display = 'none';
-          };
+          if (noPortCB) noPortCB(ports);
         }
 
       });
@@ -57,7 +36,8 @@
     var stringReceived = '';
 
     this.write = function(str) {
-      chrome.serial.send(_this.connectionId, convertStringToArrayBuffer(str + '\n'), function() {});
+      if (_this.connectionId)
+        chrome.serial.send(_this.connectionId, convertStringToArrayBuffer(str + '\n'), function() {});
     };
 
     // Convert string to ArrayBuffer
@@ -310,11 +290,13 @@
     this.digitalWrite = function(pin, state) {
       if (pin <= 15) this.serial.write(asChar(START + DIGI_WRITE + ((pin & 15) << 1) + (state & 1)));
       else if (pin <= 19) this.serial.write(asChar(START + DIGI_WRITE_2 + ((pin - 16) << 1) + (state & 1)));
+      console.log('digital write' + (START + DIGI_WRITE_2 + ((pin - 16) << 1) + (state & 1)));
 
       //else console.log('Pin must be less than or equal to 13');
     };
 
     this.digitalRead = function(pin) {
+      console.log('digitalread ' + (START + DIGI_READ + (pin & 31)));
       this.serial.write(asChar(START + DIGI_READ + (pin & 31)));
     };
 
@@ -488,12 +470,16 @@
       this.onConnect();
     };
 
+    this.begin = function(noPortCB) {
+      var _this = this;
+      this.serial.connect(_this.port, _this.serialOpenCB.bind(_this), noPortCB);
+    };
+
     this.createdCallback = function() {
       var _this = this;
       this.port = this.getAttribute('serialport');
       this.serial = new serial();
       this.serial.messageCallback = _this.onMessage.bind(_this);
-      this.serial.connect(_this.port, _this.serialOpenCB.bind(_this));
 
       //this.ws.connect();
     };
