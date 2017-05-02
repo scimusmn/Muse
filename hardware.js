@@ -6,7 +6,8 @@
 
 // create the elements used for hardware input
 
-include(['./ArduinoChromeApp.js'],()=>{
+obtain(['µ/Arduino'], (ard)=> {
+  var Arduino = ard.Arduino;
   var inPut = inheritFrom(HTMLElement, function() {
 
     //default
@@ -14,15 +15,23 @@ include(['./ArduinoChromeApp.js'],()=>{
       console.log('Handler function not yet initialized');
     };
 
-    this.read = function() {
-      var p = this.parentElement.arduino;
-      if (p.ready) {
-        if (this.type == 'analog') p.analogRead(this.pin);
-        else p.digitalRead(this.pin);
-      }
-    };
-
     this.createdCallback = function() {
+      var _this = this;
+      _this.readTO = null;
+
+      this.onError = () => {
+        console.log('Did not hear back about read on ' + _this.pin);
+      };
+
+      this.read = function() {
+        var p = _this.parentElement.arduino;
+        if (p.ready) {
+          _this.readTO = setTimeout(_this.onError, 1000);
+          if (_this.type == 'analog') p.analogRead(_this.pin);
+          else p.digitalRead(_this.pin);
+        }
+      };
+
       //grab the type and pin attributes
       this.type = this.getAttribute('type');
       this.pin = this.getAttribute('pin');
@@ -58,16 +67,24 @@ include(['./ArduinoChromeApp.js'],()=>{
   // create the elements used for hardware output
 
   var outPut = inheritFrom(HTMLElement, function() {
-    this.mode = true;
-    this.state = 0;
+
+    this.onError = ()=> {
+      if (this.pin) console.log("haven't heard about " + this.pin);
+    };
+
+    this.onData = ()=> {
+      if (this.pin) console.log('Heard about the write on ' + this.pin);
+    };
 
     this.write = function(val) {
       this.state = val;
+      this.outputTO = setTimeout(this.onError, 500);
       if (this.mode) this.parentElement.arduino.analogWrite(this.pin, val);
       else this.parentElement.arduino.digitalWrite(this.pin, val);
     };
 
     this.createdCallback = function() {
+      this.outputTO = null;
       this.type = this.getAttribute('type');
       this.pin = this.getAttribute('pin');
       this.mode = (this.type == 'analog');
@@ -82,7 +99,7 @@ include(['./ArduinoChromeApp.js'],()=>{
   /////////////////////////////////////////////////////////////
 
   var hardWare = inheritFrom(HTMLElement, function() {
-
+    console.log('defining hard-ware');
     this.onConnect = function() {};
 
     this.init = function() {
@@ -108,22 +125,34 @@ include(['./ArduinoChromeApp.js'],()=>{
         } else if (item.type === 'digital') {
           _this.arduino.watchPin(item.pin, function(pin, val) {
             if (!item.hit) {
+              clearTimeout(item.readTO);
               if (!item.target) item.onData(val);
               else item.target[item.which](val);
 
-              item.hit = true;
-              item.dbTimer = setTimeout(function() {item.hit = false; }, item.debounce);
+              if (item.debounce) {
+                item.hit = true;
+                item.dbTimer = setTimeout(function() {item.hit = false; }, item.debounce);
+              }
+
             }
           });
         }
+      });
+
+      var outputs = [].slice.call(this.querySelectorAll('out-put'));
+      outputs.forEach(function(item, i, arr) {
+        _this.arduino.setHandler(item.pin, (pin, val)=> {
+          clearTimeout(item.outputTO);
+          item.onData(val);
+        });
       });
     };
 
     this.begin = function(noPortCB) {
       var _this = this;
+      console.log('The port is ' + _this.port);
       _this.arduino.serial.onPortNotFound = noPortCB;
       _this.arduino.connect(_this.port, ()=> {
-        //_this.onReady();
         _this.init();
       });
     };
@@ -142,5 +171,7 @@ include(['./ArduinoChromeApp.js'],()=>{
     };
   });
 
-  document.registerElement('hard-ware', hardWare);
+  exports.Hardware = document.registerElement('hard-ware', hardWare);
+
+  provide(exports);
 });

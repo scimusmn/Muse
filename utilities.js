@@ -1,70 +1,5 @@
 'use strict';
 
-window.µ = function(id, elem) {
-  var ret;
-  var root = ((elem) ? elem : document);
-  var spl = id.split('>');
-  switch (spl[0].charAt(0)) {
-    case '|':
-      ret = root;
-      break;
-    case '+':
-      ret = document.createElement(spl[0].substring(1));
-      if (elem) elem.appendChild(ret);
-      break;
-    case '#':
-      ret = root.querySelector(spl[0]);
-      break;
-    default:
-      ret = root.querySelectorAll(spl[0]);
-
-      //if(ret.length==1) ret = ret[0];
-      //else{
-      ret.forEach = function(cb) {
-          for (let i = 0; i < ret.length; i++) {
-            cb(i, ret[i]);
-          }
-        };
-
-      ret.style = function(mem, val) {
-          for (let i = 0; i < ret.length; i++) {
-            ret[i].style[mem] = val;
-          }
-        };
-
-      //}
-      break;
-  }
-  if (spl.length <= 1) return ret;
-  else return ret.getAttribute(spl[1]);
-};
-
-window.inheritFrom = function(parent, addMethods) {
-  var _parent = parent;
-  var ret = function() {
-    if (_parent) {
-      _parent.apply(this, arguments);
-    }
-  };
-
-  //console.log(_parent);
-
-  ret.prototype = Object.create(_parent && _parent.prototype, {
-    constructor: {
-      value: ret,
-      enumerable: false,
-      writable: true,
-      configurable: true,
-    },
-  });
-  if (_parent) ret.__proto__ = _parent;
-
-  if (typeof addMethods === 'function')
-    addMethods.call(ret.prototype);
-
-  return ret;
-};
-
 Function.prototype.inherits = function(parent) {
   this.prototype = Object.create(parent && parent.prototype, {
     constructor: {
@@ -75,85 +10,6 @@ Function.prototype.inherits = function(parent) {
     },
   });
   if (parent) this.__proto__ = parent;
-};
-
-function ajax(src, fxn) {
-  var http = new XMLHttpRequest();
-  var ret = 0;
-
-  http.open('get', src);
-  http.responseType = 'document';
-  http.onreadystatechange = function() {
-    if (http.readyState == 4) {
-      ret = http.responseXML;
-      fxn(ret);
-    }
-  };
-
-  http.send(null);
-
-  return ret;
-}
-
-window.get = function(url) {
-  // Return a new promise.
-  return new Promise(function(resolve, reject) {
-    // Do the usual XHR stuff
-    var req = new XMLHttpRequest();
-    req.open('GET', url);
-
-    req.onload = function() {
-      // This is called even on 404 etc
-      // so check the status
-      if (req.status == 200) {
-        // Resolve the promise with the response text
-        resolve(req);
-      } else {
-        // Otherwise reject with the status text
-        // which will hopefully be a meaningful error
-        reject(Error(req.statusText));
-      }
-    };
-
-    // Handle network errors
-    req.onerror = function() {
-      reject(Error('Network Error'));
-    };
-
-    // Make the request
-    req.send();
-  });
-};
-
-window.post = function(url, obj) {
-  // Return a new promise.
-  return new Promise(function(resolve, reject) {
-    // Do the usual XHR stuff
-    var req = new XMLHttpRequest();
-    req.open('POST', url);
-    req.setRequestHeader('Content-type', 'application/json');
-
-    req.onload = function() {
-      // This is called even on 404 etc
-      // so check the status
-      if (req.status == 200) {
-        // Resolve the promise with the response text
-        resolve(req.response);
-      } else {
-        // Otherwise reject with the status text
-        // which will hopefully be a meaningful error
-        reject(Error(req.statusText));
-      }
-    };
-
-    // Handle network errors
-    req.onerror = function() {
-      reject(Error('Network Error'));
-    };
-
-    // Make the request
-    req.send(JSON.stringify(obj));
-  });
 };
 
 function loadFile(src, Fxn) {
@@ -189,7 +45,7 @@ function loadFile(src, Fxn) {
   return this;
 }
 
-function transplant(node) {
+exports.transplant = (node)=> {
   var temp = node.cloneNode(true);
   var par = node.parentElement;
   par.insertBefore(temp, node);
@@ -264,23 +120,41 @@ var charCode = function(string) {
   return string.charCodeAt(0);
 };
 
-function degToRad(d) {
+exports.ajax = (src, fxn)=> {
+  var http = new XMLHttpRequest();
+  var ret = 0;
+
+  http.open('get', src);
+  http.responseType = 'document';
+  http.onreadystatechange = function() {
+    if (http.readyState == 4) {
+      ret = http.responseXML;
+      fxn(ret);
+    }
+  };
+
+  http.send(null);
+
+  return ret;
+};
+
+exports.degToRad = (d)=> {
   // Converts degrees to radians
   return d * 0.0174532925199432957;
-}
+};
 
-function itoa(i)
+exports.itoa = (i)=>
 {
   return String.fromCharCode(i);
-}
+};
 
-function bitRead(num, pos) {
+exports.bitRead = (num, pos)=> {
   return (num & Math.pow(2, pos)) >> pos;
-}
+};
 
-function distance(p1, p2) {
+exports.distance = (p1, p2)=> {
   return Math.sqrt(Math.pow((p2.x - p1.x), 2) + Math.pow((p2.y - p1.y), 2));
-}
+};
 
 Array.prototype.min = function() {
   return Math.min.apply({}, this);
@@ -294,13 +168,13 @@ Array.prototype.last = function() {
   return this[this.length - 1];
 };
 
-function getPos(el) {
+exports.getPos = (el)=> {
   // yay readability
   for (var lx = 0, ly = 0; el != null; lx += el.offsetLeft, ly += el.offsetTop, el = el.offsetParent);
   return { x: lx, y: ly };
-}
+};
 
-function aveCont(points) {
+exports.aveCont = function(points) {
   if (points === undefined) points = 5;
   var samps = [];
   this.ave = 0;
@@ -337,27 +211,27 @@ function aveCont(points) {
   };
 
   return this;
-}
+};
 
-function map(val, inMin, inMax, outMin, outMax) {
+exports.map = (val, inMin, inMax, outMin, outMax)=> {
   return (val - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
-}
+};
 
-function clamp(val, Min, Max) {
+exports.clamp = (val, Min, Max)=> {
   return Math.max(Min, min(val, Max));
-}
+};
 
-function sign(x) {
+exports.sign = (x)=> {
   return (x > 0) - (x < 0);
-}
+};
 
-function zeroPad(num, size) {
+exports.zeroPad = (num, size)=> {
   var s = num + '';
   while (s.length < size) s = '0' + s;
   return s;
-}
+};
 
-function position(elem) {
+exports.position = (elem)=> {
   var offset = { x:0, y:0 };
   while (elem)
   {
@@ -367,21 +241,21 @@ function position(elem) {
   }
 
   return offset;
-}
+};
 
-function extractNumber(value)
+exports.extractNumber = (value)=>
 {
   var n = parseInt(value);
 
   return n == null || isNaN(n) ? 0 : n;
-}
+};
 
 // Reduce a fraction by finding the Greatest Common Divisor and dividing by it.
-function reduce(numerator, denominator) {
+exports.reduce = (numerator, denominator)=> {
   var gcd = function gcd(a, b) {
     return b ? gcd(b, a % b) : a;
   };
 
   gcd = gcd(numerator, denominator);
   return [numerator / gcd, denominator / gcd];
-}
+};

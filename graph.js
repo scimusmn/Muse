@@ -1,4 +1,7 @@
-include(['./pointStack.js'], function() {
+//var ps = obtain('µ/pointStack.js');
+
+obtain(['µ/pointStack.js'], function(ps) {
+  var pointStack = ps.pointStack;
   function param() {
     this.x = {
       min:0,
@@ -33,7 +36,7 @@ include(['./pointStack.js'], function() {
       },
     };
 
-    this.mouse = {x:0, y:0};
+    this.mouse = { x:0, y:0 };
 
     this.range = new param();
 
@@ -70,7 +73,7 @@ include(['./pointStack.js'], function() {
       var pixelX = gridX * this.cellWidth;
       var pixelY = this.height - gridY * this.cellHeight;
 
-      return {x:pixelX, y:pixelY};
+      return { x:pixelX, y:pixelY };
 
     };
 
@@ -90,7 +93,7 @@ include(['./pointStack.js'], function() {
       this.newPoint[which].val = val;
       this.newPoint[which].new = true;
       if (this.newPoint.x.new && this.newPoint.y.new) {
-        this.addPoint({x:this.newPoint.x.val, y:this.newPoint.y.val});
+        this.addPoint({ x:this.newPoint.x.val, y:this.newPoint.y.val });
       }
     };
 
@@ -98,7 +101,7 @@ include(['./pointStack.js'], function() {
       this.newPoint.x.val = val;
       this.newPoint.x.new = true;
       if (this.newPoint.x.new && this.newPoint.y.new) {
-        this.addPoint({x:this.newPoint.x.val, y:this.newPoint.y.val});
+        this.addPoint({ x:this.newPoint.x.val, y:this.newPoint.y.val });
       }
     };
 
@@ -106,13 +109,13 @@ include(['./pointStack.js'], function() {
       this.newPoint.y.val = val;
       this.newPoint.y.new = true;
       if (this.newPoint.x.new && this.newPoint.y.new) {
-        this.addPoint({x:this.newPoint.x.val, y:this.newPoint.y.val});
+        this.addPoint({ x:this.newPoint.x.val, y:this.newPoint.y.val });
       }
     };
 
     this.lastPoint = function() {
       if (this.points.length)
-				return {x:this.convert(this.points.last().x, 'x'), y:this.convert(this.points.last().y, 'y')};
+				return { x:this.convert(this.points.last().x, 'x'), y:this.convert(this.points.last().y, 'y') };
     };
 
     this.drawTrace = function() {
@@ -208,32 +211,32 @@ include(['./pointStack.js'], function() {
       //this.canvas = document.createElement('canvas');
       //this.setup(this);
       this.range = new param();
-                              
-                              this.newPoint = {
-                              x:{
-                              val:0,
-                              new:false,
-                              },
-                              y:{
-                              val:0,
-                              new:false,
-                              },
-                              };
-                              
-      var xR = {min:µ('|>xMin', this), max:µ('|>xMax', this)};
-      var yR = {min:µ('|>yMin', this), max:µ('|>yMax', this)};
+
+      this.newPoint = {
+        x:{
+          val:0,
+          new:false,
+        },
+        y:{
+          val:0,
+          new:false,
+        },
+      };
+
+      var xR = { min:µ('|>xMin', this), max:µ('|>xMax', this) };
+      var yR = { min:µ('|>yMin', this), max:µ('|>yMax', this) };
       this.setRange(xR.min, xR.max, yR.min, yR.max);
       this.setNumDivs(µ('|>xDiv', this), µ('|>yDiv', this));
       var flip = '';
       if (flip = µ('|>flip', this)) {
-                              this.range.x.flip = (~µ('|>flip', this).indexOf('x'))?true:false;
-        this.range.y.flip = (~µ('|>flip', this).indexOf('y'))?true:false;
+        this.range.x.flip = (~µ('|>flip', this).indexOf('x')) ? true : false;
+        this.range.y.flip = (~µ('|>flip', this).indexOf('y')) ? true : false;
       }
 
       numPoints = µ('|>numPoints', this);
 
       ctx = this.getContext('2d');
-      this.points = new pointStack((numPoints) ? parseInt(numPoints) : 1500);
+      this.points = pointStack((numPoints) ? parseInt(numPoints) : 1500);
 
       this.labelFont = 'lighter 2vh sans-serif';
       this.fontColor = '#000';
@@ -243,7 +246,7 @@ include(['./pointStack.js'], function() {
       this.gridColor = 'rgba(0,0,0,.1)';
       this.refreshRate = 30;
 
-      this.mouse = {x:0, y:0};
+      this.mouse = { x:0, y:0 };
       this.width = this.clientWidth;
       this.height = this.clientHeight;
       this.cellWidth = this.width / this.range.x.divs;
@@ -259,6 +262,6 @@ include(['./pointStack.js'], function() {
     };
   });
 
-  document.registerElement('muse-graph', {prototype: museGraph.prototype, extends: 'canvas'});
+  document.registerElement('muse-graph', { prototype: museGraph.prototype, extends: 'canvas' });
   window.museGraph = museGraph;
 });
