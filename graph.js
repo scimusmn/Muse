@@ -1,6 +1,6 @@
 //var ps = obtain('µ/pointStack.js');
 
-obtain(['µ/pointStack.js'], function(ps) {
+obtain(['µ/pointStack.js', 'µ/utilities.js'], function(ps, utils) {
   var pointStack = ps.pointStack;
   function param() {
     this.x = {
@@ -62,9 +62,9 @@ obtain(['µ/pointStack.js'], function(ps) {
     };
 
     this.convert = function(val, which) {
-      if (!this.range[which].flip) return map(val, 0, 1, this.range[which].min, this.range[which].max);
+      if (!this.range[which].flip) return utils.map(val, 0, 1, this.range[which].min, this.range[which].max);
 
-      else return map(val, 1, 0, this.range[which].min, this.range[which].max);
+      else return utils.map(val, 1, 0, this.range[which].min, this.range[which].max);
     };
 
     // Convert grid coordinates to pixel coordinates
