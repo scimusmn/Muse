@@ -182,13 +182,13 @@ if (typeof customElements === 'undefined') {
   scrpt.src = museDir + 'webcomponents-lite.js';
   window.addEventListener('WebComponentsReady', function() {
     obtain([app], (appl)=> {
-      appl.run();
+      //appl.run();
     });
   });
 
   document.head.insertBefore(scrpt, document.currentScript);
 } else {
   obtain([app], (appl)=> {
-    appl.run();
+    //appl.run();
   });
 }
