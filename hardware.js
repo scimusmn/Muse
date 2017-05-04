@@ -6,7 +6,7 @@
 
 // create the elements used for hardware input
 
-obtain(['µ/Arduino'], (ard)=> {
+obtain(['µ/Arduino', 'µ/utilities.js'], (ard, utils)=> {
   var Arduino = ard.Arduino;
   var inPut = inheritFrom(HTMLElement, function() {
 
@@ -100,62 +100,6 @@ obtain(['µ/Arduino'], (ard)=> {
 
   var hardWare = inheritFrom(HTMLElement, function() {
     console.log('defining hard-ware');
-    this.onConnect = function() {};
-
-    this.init = function() {
-      console.log('initializing hardware...');
-      var _this = this;
-      this.ready = true;
-      this.onReady();
-      var inputs = [].slice.call(this.querySelectorAll('in-put'));
-      inputs.forEach(function(item, i, arr) {
-        if (item.type === 'analog') {
-          //create the handler function to parse the data
-          function handle(pin, val) {
-            item.raw = val;
-            if (item.min && item.max) val = map(val, item.min, item.max, 0, 1);
-            if (!item.target) item.onData(val);
-            else item.target[item.which](val);
-          }
-
-          //if the pin is set to report, init the report, otherwise, set the handler
-          if (item.report) _this.arduino.analogReport(item.pin, item.report, handle);
-          else _this.arduino.setHandler(item.pin, handle);
-
-        } else if (item.type === 'digital') {
-          _this.arduino.watchPin(item.pin, function(pin, val) {
-            if (!item.hit) {
-              clearTimeout(item.readTO);
-              if (!item.target) item.onData(val);
-              else item.target[item.which](val);
-
-              if (item.debounce) {
-                item.hit = true;
-                item.dbTimer = setTimeout(function() {item.hit = false; }, item.debounce);
-              }
-
-            }
-          });
-        }
-      });
-
-      var outputs = [].slice.call(this.querySelectorAll('out-put'));
-      outputs.forEach(function(item, i, arr) {
-        _this.arduino.setHandler(item.pin, (pin, val)=> {
-          clearTimeout(item.outputTO);
-          item.onData(val);
-        });
-      });
-    };
-
-    this.begin = function(noPortCB) {
-      var _this = this;
-      console.log('The port is ' + _this.port);
-      _this.arduino.serial.onPortNotFound = noPortCB;
-      _this.arduino.connect(_this.port, ()=> {
-        _this.init();
-      });
-    };
 
     this.createdCallback = function() {
       var _this = this;
@@ -168,6 +112,61 @@ obtain(['µ/Arduino'], (ard)=> {
 
     this.attachedCallback = function() {
       var _this = this;
+
+      _this.onConnect = function() {};
+
+      _this.init = function() {
+        console.log('initializing hardware...');
+        this.ready = true;
+        this.onReady();
+        var inputs = [].slice.call(this.querySelectorAll('in-put'));
+        inputs.forEach(function(item, i, arr) {
+          if (item.type === 'analog') {
+            //create the handler function to parse the data
+            function handle(pin, val) {
+              item.raw = val;
+              if (item.min && item.max) val = utils.map(val, item.min, item.max, 0, 1);
+              if (!item.target) item.onData(val);
+              else item.target[item.which](val);
+            }
+
+            //if the pin is set to report, init the report, otherwise, set the handler
+            if (item.report) _this.arduino.analogReport(item.pin, item.report, handle);
+            else _this.arduino.setHandler(item.pin, handle);
+
+          } else if (item.type === 'digital') {
+            _this.arduino.watchPin(item.pin, function(pin, val) {
+              if (!item.hit) {
+                clearTimeout(item.readTO);
+                if (!item.target) item.onData(val);
+                else item.target[item.which](val);
+
+                if (item.debounce) {
+                  item.hit = true;
+                  item.dbTimer = setTimeout(function() {item.hit = false; }, item.debounce);
+                }
+
+              }
+            });
+          }
+        });
+
+        var outputs = [].slice.call(this.querySelectorAll('out-put'));
+        outputs.forEach(function(item, i, arr) {
+          _this.arduino.setHandler(item.pin, (pin, val)=> {
+            clearTimeout(item.outputTO);
+            item.onData(val);
+          });
+        });
+      };
+
+      _this.begin = function(noPortCB) {
+        console.log('The port is ' + _this.port);
+        _this.arduino.serial.onPortNotFound = noPortCB;
+        _this.arduino.connect(_this.port, ()=> {
+          _this.init();
+        });
+      };
     };
   });
 
