@@ -130,7 +130,6 @@ var museDir = '';
 let script = document.currentScript;
 museDir = script.src.substr(0, script.src.lastIndexOf('/') + 1);
 if (require) museDir = museDir.replace('file://', '');
-console.log(museDir + ' is teh current script');
 
 window.provide = function(exports) {
 };
@@ -143,16 +142,20 @@ window.obtain = (addr, func)=> {
     if (adr.includes('µ/')) adr = adr.replace('µ/', museDir);
     if (require) objs[ind] = require(adr);
     else get(adr).then((req)=> {
+      //console.log(adr + '::::' + req.responseText);
       var provide = function(exps) {
-        if (exps) objs[ind] = exps;
-        let check = true;
-        objs[ind].ready = true;
-        for (var i = 0; i < objs.length; i++) {
-          if (!objs[i] || !objs[i].ready) check = false;
-        }
+        //console.log('src ::: ' + exps.src);
+        if (objs[ind].ready || exps.obtained) {
+          if (exps) objs[ind] = exps;
+          let check = true;
+          objs[ind].ready = true;
+          for (var i = 0; i < arr.length; i++) {
+            if (!objs[i] || !objs[i].ready) check = false;
+          }
 
-        if (check) {
-          func.apply(null, objs);
+          if (check) {
+            func.apply(null, objs);
+          }
         }
       };
 
@@ -173,6 +176,19 @@ window.obtain = (addr, func)=> {
 };
 
 var app = script.getAttribute('main');
-obtain(['µ/utils.js', app], (muse, app)=> {
 
-});
+if (typeof customElements === 'undefined') {
+  var scrpt = document.createElement('script');
+  scrpt.src = museDir + 'webcomponents-lite.js';
+  window.addEventListener('WebComponentsReady', function() {
+    obtain([app], (appl)=> {
+      appl.run();
+    });
+  });
+
+  document.head.insertBefore(scrpt, document.currentScript);
+} else {
+  obtain([app], (appl)=> {
+    appl.run();
+  });
+}
