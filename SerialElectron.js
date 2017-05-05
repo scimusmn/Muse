@@ -21,7 +21,6 @@ obtain(['serialport'], (com)=> {
     };
 
     _this.open = (name, fxn) => {
-      console.log(name);
       if (name[0] != '/')
         com.list(function(err, ports) {
           let found = false;
