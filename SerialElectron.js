@@ -41,7 +41,7 @@ obtain(['serialport'], (com)=> {
     _this.openByName = (portName, fxn) => {
       if (fxn) _this.onMessage = fxn;
       console.log('Opening serialport ' + portName);
-      ser = new com.SerialPort(portName, {
+      ser = new com(portName, {
         baudrate: 115200,
         parser: com.parsers.readline('\r\n', 'binary'),
         buffersize:bufSize,
