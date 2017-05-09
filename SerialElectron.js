@@ -58,7 +58,6 @@ obtain(['serialport'], (com)=> {
 
       ser.on('error', function() {
         console.log('Error from SerialPort');
-        sp = null;
       });
     };
   };
