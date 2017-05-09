@@ -21,7 +21,6 @@ obtain(['serialport'], (com)=> {
     };
 
     _this.open = (name, fxn) => {
-      console.log(name);
       if (name[0] != '/')
         com.list(function(err, ports) {
           let found = false;
@@ -42,7 +41,7 @@ obtain(['serialport'], (com)=> {
     _this.openByName = (portName, fxn) => {
       if (fxn) _this.onMessage = fxn;
       console.log('Opening serialport ' + portName);
-      ser = new com.SerialPort(portName, {
+      ser = new com(portName, {
         baudrate: 115200,
         parser: com.parsers.readline('\r\n', 'binary'),
         buffersize:bufSize,
@@ -59,7 +58,6 @@ obtain(['serialport'], (com)=> {
 
       ser.on('error', function() {
         console.log('Error from SerialPort');
-        sp = null;
       });
     };
   };

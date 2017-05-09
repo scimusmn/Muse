@@ -3,7 +3,7 @@
 ////////////////////////////////////////////////////////
 
 var SerialFile = 'µ/SerialElectron.js';
-if (window.isApp === true) SerialFile = 'µ/SerialChrome.js';
+if (window.isChromeApp === true) SerialFile = 'µ/SerialChrome.js';
 
 obtain([SerialFile], (ser) => {
   exports.Arduino = function() {

@@ -188,7 +188,9 @@ if (typeof customElements === 'undefined') {
 
   document.head.insertBefore(scrpt, document.currentScript);
 } else {
-  obtain([app], (appl)=> {
-    //appl.run();
+  obtain([app], (imports)=> {
+    document.addEventListener('DOMContentLoaded', function(event) {
+      imports.app.run();
+    });
   });
 }
