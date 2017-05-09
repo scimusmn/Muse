@@ -142,33 +142,35 @@ window.obtain = (addr, func)=> {
     if (adr.includes('µ/')) adr = adr.replace('µ/', museDir);
     if (require) objs[ind] = require(adr);
     else get(adr).then((req)=> {
-      //console.log(adr + '::::' + req.responseText);
-      var provide = function(exps) {
-        //console.log('src ::: ' + exps.src);
-        if (objs[ind].ready || exps.obtained) {
-          if (exps) objs[ind] = exps;
-          let check = true;
-          objs[ind].ready = true;
-          for (var i = 0; i < arr.length; i++) {
-            if (!objs[i] || !objs[i].ready) check = false;
-          }
+      if (req.responseURL.substr(0, location.origin.length) == location.origin) {
+        var provide = function(exps) {
+          //console.log('src ::: ' + exps.src);
+          if (objs[ind].ready || exps.obtained) {
+            if (exps) objs[ind] = exps;
+            let check = true;
+            objs[ind].ready = true;
+            for (var i = 0; i < arr.length; i++) {
+              if (!objs[i] || !objs[i].ready) check = false;
+            }
 
-          if (check) {
-            func.apply(null, objs);
+            if (check) {
+              func.apply(null, objs);
+            }
           }
+        };
+
+        var intro = '()=>{var exports = {src: "' + adr + '", ready: ';
+        var re = /obtain\s*\(\s*\[/g;
+        if (req.responseText.match(re)) {
+          intro += 'false, obtained: true}; ';
+        } else intro += 'true}; ';
+
+        objs[ind] = eval(intro + req.responseText + ' return exports;};')();
+        if (objs[ind].ready) {
+          provide(objs[ind]);
         }
-      };
-
-      var intro = '()=>{var exports = {src: "' + adr + '", ready: ';
-      var re = /obtain\s*\(\s*\[/g;
-      if (req.responseText.match(re)) {
-        intro += 'false, obtained: true}; ';
-      } else intro += 'true}; ';
-
-      objs[ind] = eval(intro + req.responseText + ' return exports;};')();
-      if (objs[ind].ready) {
-        provide(objs[ind]);
       }
+
     });
   });
 
