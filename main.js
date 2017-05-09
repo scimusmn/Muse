@@ -182,7 +182,8 @@ if (typeof customElements === 'undefined') {
   scrpt.src = museDir + 'webcomponents-lite.js';
   window.addEventListener('WebComponentsReady', function() {
     obtain([app], (imports)=> {
-      document.addEventListener('DOMContentLoaded', function(event) {
+      if (document.readyState === 'complete') imports.app.run();
+      else document.addEventListener('DOMContentLoaded', function(event) {
         imports.app.run();
       });
     });
@@ -191,7 +192,8 @@ if (typeof customElements === 'undefined') {
   document.head.insertBefore(scrpt, document.currentScript);
 } else {
   obtain([app], (imports)=> {
-    document.addEventListener('DOMContentLoaded', function(event) {
+    if (document.readyState === 'complete') imports.app.run();
+    else document.addEventListener('DOMContentLoaded', function(event) {
       imports.app.run();
     });
   });
