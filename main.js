@@ -63,13 +63,14 @@ window.inheritFrom = function(parent, addMethods) {
   return ret;
 };
 
-window.get = function(url, type) {
+window.get = function(url, params) {
   // Return a new promise.
   return new Promise(function(resolve, reject) {
     // Do the usual XHR stuff
     var req = new XMLHttpRequest();
-    if (type) req.responseType = type;
-    req.open('GET', url);
+    if (params && params.type) req.responseType = params.type;
+    if (params && params.credentials) req.open('GET', url, params.credentials);
+    else req.open('GET', url);
 
     req.onload = function() {
       // This is called even on 404 etc

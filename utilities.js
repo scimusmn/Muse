@@ -14,6 +14,49 @@ Function.prototype.inherits = function(parent) {
   if (parent) this.__proto__ = parent;
 };
 
+exports.getCORS = function(url, params) {
+  // Return a new promise.
+  return new Promise(function(resolve, reject) {
+    // Do the usual XHR stuff
+    var req = new XMLHttpRequest();
+    if ('withCredentials' in req) {
+      req.open('GET', url, true);
+    } else if (typeof XDomainRequest != 'undefined') {
+      req = new XDomainRequest();
+      req.open('GET', url);
+    } else {
+      req = null;
+    }
+
+    if (params && params.type) {
+      req.setRequestHeader('Content-type', params);
+    }
+
+    req.withCredentials = true;
+
+    req.onload = function() {
+      // This is called even on 404 etc
+      // so check the status
+      if (req.status == 200) {
+        // Resolve the promise with the response text
+        resolve(req);
+      } else {
+        // Otherwise reject with the status text
+        // which will hopefully be a meaningful error
+        reject(Error(req.statusText));
+      }
+    };
+
+    // Handle network errors
+    req.onerror = function() {
+      reject(Error('Network Error'));
+    };
+
+    // Make the request
+    req.send();
+  });
+};
+
 function loadFile(src, Fxn) {
   var _this = this;
   var http = new XMLHttpRequest();
