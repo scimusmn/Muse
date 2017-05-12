@@ -146,7 +146,7 @@ window.obtain = (addr, func)=> {
       if (req.responseURL.substr(0, location.origin.length) == location.origin) {
         var provide = function(exps) {
           //console.log('src ::: ' + exps.src);
-          if (objs[ind].ready || exps.obtained) {
+          if (exps.ready || exps.obtained) {
             if (exps) objs[ind] = exps;
             let check = true;
             objs[ind].ready = true;
