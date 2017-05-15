@@ -161,7 +161,7 @@ var revokeBlobURL = function(URL) {
   window.URL.revokeObjectURL(URL);
 };
 
-var charCode = function(string) {
+exports.charCode = function(string) {
   return string.charCodeAt(0);
 };
 

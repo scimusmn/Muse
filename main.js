@@ -185,9 +185,9 @@ if (typeof customElements === 'undefined') {
   scrpt.src = museDir + 'webcomponents-lite.js';
   window.addEventListener('WebComponentsReady', function() {
     obtain([app], (imports)=> {
-      if (document.readyState === 'complete') imports.app.run();
+      if (document.readyState === 'complete') imports.app.start();
       else document.addEventListener('DOMContentLoaded', function(event) {
-        imports.app.run();
+        imports.app.start();
       });
     });
   });
@@ -195,9 +195,9 @@ if (typeof customElements === 'undefined') {
   document.head.insertBefore(scrpt, document.currentScript);
 } else {
   obtain([app], (imports)=> {
-    if (document.readyState === 'complete') imports.app.run();
+    if (document.readyState === 'complete') imports.app.start();
     else document.addEventListener('DOMContentLoaded', function(event) {
-      imports.app.run();
+      imports.app.start();
     });
   });
 }
