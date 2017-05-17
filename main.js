@@ -1,3 +1,11 @@
+if (typeof require == 'undefined') var require = false;
+var museDir = '';
+let script = document.currentScript;
+museDir = script.src.substr(0, script.src.lastIndexOf('/') + 1);
+console.log(museDir);
+if (museDir.includes('C:\\')) museDir = museDir.replace('file:///', '');
+if (require) museDir = museDir.replace('file://', '');
+
 window.µ = function(id, elem) {
   var ret;
   var root = ((elem) ? elem : document);
@@ -36,6 +44,8 @@ window.µ = function(id, elem) {
   if (spl.length <= 1) return ret;
   else return ret.getAttribute(spl[1]);
 };
+
+window.µ.dir = museDir;
 
 window.inheritFrom = function(parent, addMethods) {
   var _parent = parent;
@@ -125,14 +135,6 @@ window.post = function(url, obj) {
     req.send(JSON.stringify(obj));
   });
 };
-
-if (typeof require == 'undefined') var require = false;
-var museDir = '';
-let script = document.currentScript;
-museDir = script.src.substr(0, script.src.lastIndexOf('/') + 1);
-console.log(museDir);
-if (museDir.includes('C:\\')) museDir = museDir.replace('file:///', '');
-if (require) museDir = museDir.replace('file://', '');
 
 window.provide = function(exports) {
 };
