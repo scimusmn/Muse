@@ -190,7 +190,7 @@ if (typeof customElements === 'undefined') {
   window.addEventListener('WebComponentsReady', function() {
     obtain([app], (imports)=> {
       if (document.readyState === 'complete') imports.app.start();
-      else document.addEventListener('DOMContentLoaded', function(event) {
+      else window.addEventListener('load', function(event) {
         imports.app.start();
       });
     });
@@ -200,7 +200,7 @@ if (typeof customElements === 'undefined') {
 } else {
   obtain([app], (imports)=> {
     if (document.readyState === 'complete') imports.app.start();
-    else document.addEventListener('DOMContentLoaded', function(event) {
+    else window.addEventListener('load', function(event) {
       imports.app.start();
     });
   });
