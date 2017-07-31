@@ -47,6 +47,80 @@ window.µ = function(id, elem) {
 
 window.µ.dir = museDir;
 
+/*Object.prototype.loadProperty = function(params) {
+  var cur = params.default;
+  get(params.url, { type: 'text' }).then(res=> {
+    cur = JSON.parse(res.responseText)[params.name];
+  });
+  Object.defineProperty(this, params.name, {
+    get: function() {
+      return cur;
+    },
+
+    set: function(val) {
+      cur = val;
+    },
+  });
+};*/
+
+/*window.µTrack = Symbol('trackChange');
+
+Number.prototype[µTrack] = function(params) {
+  this.trackObj = params.obj;
+  var oldValueOf = this.valueOf;
+  var oldStringOf = this.toString;
+  this.valueOf = function() {
+    console.log(this.trackObj[params.name] + ' is the current value ');
+    if (this.trackObj.obj[params.name]) return this.trackObj.obj[params.name];
+    else return this;
+  };
+
+  console.log(this.valueOf);
+
+  this.toString = function() {
+    if (this.trackObj.obj[params.name]) return this.trackObj.obj[params.name];
+    else return oldValueOf();
+  };
+};*/
+
+/*class Tracker extends Object {
+  constructor(args) {
+    super(args);
+    var _this = this;
+
+    this.primitive = null;
+    this.props = args.property.split('>');
+    if (typeof args.object !== 'undefined') {
+      this.tracked = args.object;
+    }
+
+    if (typeof args.default !== 'undefined') this.primitive = args.default;
+    if (typeof args.url !== 'undefined') {
+      this.tracked = null;
+      get(args.url, { type: 'text' }).then((req)=> {
+        _this.tracked = JSON.parse(req.responseText);
+      });
+    }
+  }
+
+  valueOf() {
+    if (this.tracked) {
+      var val = this.tracked;
+      for (let i = 0; i < this.props.length; i++) {
+        val = val[this.props[i]];
+      }
+
+      return val;
+    }
+
+    return this.primitive;
+  }
+
+  toString() {
+    return this.valueOf().toString();
+  }
+}*/
+
 window.inheritFrom = function(parent, addMethods) {
   var _parent = parent;
   var ret = function() {
@@ -164,13 +238,13 @@ window.obtain = (addr, func)=> {
           }
         };
 
-        var intro = '()=>{var exports = {src: "' + adr + '", ready: ';
+        var intro = '//# sourceURL=' + adr + '\n()=>{var exports = {src: "' + adr + '", ready: ';
         var re = /obtain\s*\(\s*\[/g;
         if (req.responseText.match(re)) {
           intro += 'false, obtained: true}; ';
         } else intro += 'true}; ';
 
-        objs[ind] = eval(intro + req.responseText + ' return exports;};')();
+        objs[ind] = eval(intro  + req.responseText + ' return exports;};')();
         if (objs[ind].ready) {
           provide(objs[ind]);
         }
