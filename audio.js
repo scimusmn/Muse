@@ -1,4 +1,4 @@
-include([], function() {
+obtain([], function() {
   var synth = function(which) {
     var _this = this;
     var audio = new window.AudioContext();
@@ -59,6 +59,7 @@ include([], function() {
 
     this.setVolume = function(vol) {
       _this.volume = vol;
+      gain.gain.value = _this.volume;
     };
 
     // ramp the volume down and mute.
@@ -104,10 +105,11 @@ include([], function() {
     };
   };
 
-  window.audio = {
+  exports.audio = {
     left: new synth('left'),
     right: new synth('right'),
   };
 
   window.synth = synth;
+  provide(exports);
 });

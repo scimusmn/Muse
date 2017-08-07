@@ -272,7 +272,9 @@ if (typeof customElements === 'undefined') {
 
   document.head.insertBefore(scrpt, document.currentScript);
 } else {
+  console.log('obtain');
   obtain([app], (imports)=> {
+    console.log(imports);
     if (document.readyState === 'complete') imports.app.start();
     else window.addEventListener('load', function(event) {
       imports.app.start();
