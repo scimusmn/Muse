@@ -217,7 +217,7 @@ exports.getPos = (el)=> {
   return { x: lx, y: ly };
 };
 
-exports.aveCont = function(points) {
+exports.averager = function(points) {
   if (points === undefined) points = 5;
   var samps = [];
   this.ave = 0;
