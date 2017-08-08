@@ -45,7 +45,7 @@ window.µ = function(id, elem) {
   else return ret.getAttribute(spl[1]);
 };
 
-window.µ.dir = museDir;
+window.µdir = museDir;
 
 /*Object.prototype.loadProperty = function(params) {
   var cur = params.default;

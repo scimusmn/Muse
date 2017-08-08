@@ -1,7 +1,5 @@
 'use strict';
 
-console.log('utilities');
-
 Function.prototype.inherits = function(parent) {
   this.prototype = Object.create(parent && parent.prototype, {
     constructor: {

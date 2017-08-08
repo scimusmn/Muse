@@ -121,7 +121,6 @@ obtain(['µ/utilities.js'], (utils)=> {
   if (navigator.requestMIDIAccess) {
     var prm = navigator.requestMIDIAccess();
     prm.then(onMIDIStarted, onMIDISystemError);
-    console.log(prm);
   } else {
     console.log('requestMIDIAccess not available');
   }
