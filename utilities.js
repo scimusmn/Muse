@@ -253,6 +253,8 @@ exports.averager = function(points) {
     return this.ave;
   };
 
+  this.getBinSize = ()=> points;
+
   return this;
 };
 
