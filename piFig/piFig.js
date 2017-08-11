@@ -1,6 +1,6 @@
 var obs = ['µ/piFig/hotspot.js', 'µ/piFig/wifi.js', 'µ/piFig/autostart.js', './config.js', 'fs']
 
-obtain(, (hotspot, wifi, { config }, fs)=> {
+obtain(, (hotspot, wifi, auto, { config }, fs)=> {
   var pfg = config.piFig;
   if (pfg) {
     var confDir = µdir + '/piFig/currentConfig.json';
@@ -32,10 +32,11 @@ obtain(, (hotspot, wifi, { config }, fs)=> {
       console.log('Configuring wifi hotspot...');
       wifi.configure(pfg.wifi);
       curCfg.wifi = pfg.wifi;
-    } else if (pfg.autostart && !configsMatch(curCfg.autostart, pfg.autostart)) {
-      console.log('Configuring wifi hotspot...');
-      wifi.configure(pfg.wifi);
-      curCfg.wifi = pfg.wifi;
+    } else if (!configsMatch(curCfg.autostart, pfg.autostart)) {
+      console.log('Configuring autostart...');
+      if(pfg.autostart) auto.configure();
+      else auto.remove();
+      curCfg.autostart = pfg.autostart;
     } else if (pfg.smoothShutdown) {
       console.log('smooth shutdown');
     }
