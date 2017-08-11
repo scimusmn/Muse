@@ -1,4 +1,6 @@
-obtain(['µ/piFig/hotspot.js', 'µ/piFig/wifi.js', './config.js', 'fs'], (hotspot, wifi, { config }, fs)=> {
+var obs = ['µ/piFig/hotspot.js', 'µ/piFig/wifi.js', 'µ/piFig/autostart.js', './config.js', 'fs']
+
+obtain(, (hotspot, wifi, { config }, fs)=> {
   var pfg = config.piFig;
   if (pfg) {
     var confDir = µdir + '/piFig/currentConfig.json';
@@ -27,6 +29,10 @@ obtain(['µ/piFig/hotspot.js', 'µ/piFig/wifi.js', './config.js', 'fs'], (hotspo
       hotspot.configure(pfg.wifiHotspot);
       curCfg.wifiHotspot = pfg.wifiHotspot;
     } else if (pfg.wifi && !configsMatch(curCfg.wifi, pfg.wifi)) {
+      console.log('Configuring wifi hotspot...');
+      wifi.configure(pfg.wifi);
+      curCfg.wifi = pfg.wifi;
+    } else if (pfg.autostart && !configsMatch(curCfg.autostart, pfg.autostart)) {
       console.log('Configuring wifi hotspot...');
       wifi.configure(pfg.wifi);
       curCfg.wifi = pfg.wifi;
