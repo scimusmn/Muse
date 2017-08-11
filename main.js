@@ -2,7 +2,6 @@ if (typeof require == 'undefined') var require = false;
 var museDir = '';
 let script = document.currentScript;
 museDir = script.src.substr(0, script.src.lastIndexOf('/') + 1);
-console.log(museDir);
 if (museDir.includes('C:\\')) museDir = museDir.replace('file:///', '');
 if (require) museDir = museDir.replace('file://', '');
 
@@ -216,14 +215,14 @@ window.provide = function(exports) {
 window.obtain = (addr, func)=> {
   var _this = this;
   var objs = [];
-  addr.forEach(function(adr, ind, arr) {
+  if (addr.length <= 0) func();
+  else addr.forEach(function(adr, ind, arr) {
     let next = null;
     if (adr.includes('µ/')) adr = adr.replace('µ/', museDir);
     if (require) objs[ind] = require(adr);
     else get(adr).then((req)=> {
       if (req.responseURL.substr(0, location.origin.length) == location.origin) {
         var provide = function(exps) {
-          //console.log('src ::: ' + exps.src);
           if (exps.ready || exps.obtained) {
             if (exps) objs[ind] = exps;
             let check = true;
@@ -244,7 +243,7 @@ window.obtain = (addr, func)=> {
           intro += 'false, obtained: true}; ';
         } else intro += 'true}; ';
 
-        objs[ind] = eval(intro  + req.responseText + ' return exports;};')();
+        objs[ind] = eval(intro  + req.responseText + ' return exports;}')();
         if (objs[ind].ready) {
           provide(objs[ind]);
         }
@@ -253,31 +252,40 @@ window.obtain = (addr, func)=> {
     });
   });
 
-  if (require) func.apply(null, objs);
+  if (require && addr.length) func.apply(null, objs);
 };
 
 var app = script.getAttribute('main');
 
-if (typeof customElements === 'undefined') {
+var started = false;
+
+if (!window.customElements) {
+  console.log('Webcomponents not natively supported.');
   var scrpt = document.createElement('script');
   scrpt.src = museDir + 'webcomponents-lite.js';
   window.addEventListener('WebComponentsReady', function() {
+    console.log('Webcomponents provided through polyfill.');
     obtain([app], (imports)=> {
-      if (document.readyState === 'complete') imports.app.start();
-      else window.addEventListener('load', function(event) {
-        imports.app.start();
-      });
+      if (!started) {
+        started = true;
+        console.log(document.readyState);
+        if (document.readyState === 'complete' || document.readyState === 'loaded' || document.readyState === 'interactive') imports.app.start();
+        else document.addEventListener('DOMContentLoaded', function(event) {
+          imports.app.start();
+        });
+      }
     });
   });
 
   document.head.insertBefore(scrpt, document.currentScript);
 } else {
-  console.log('obtain');
   obtain([app], (imports)=> {
-    console.log(imports);
-    if (document.readyState === 'complete') imports.app.start();
-    else window.addEventListener('load', function(event) {
-      imports.app.start();
-    });
+    if (!started) {
+      started = true;
+      if (document.readyState === 'complete' || document.readyState === 'loaded' || document.readyState === 'interactive') imports.app.start();
+      else document.addEventListener('DOMContentLoaded', function(event) {
+        imports.app.start();
+      });
+    }
   });
 }
