@@ -82,7 +82,7 @@ obtain(['µ/utilities.js'], (utils)=> {
       _this.getMIDIInDevices();
     };
 
-    _this.onReady = ()=>{}
+    _this.onReady = ()=> {};
 
     _this.init = ()=> {
       _this.getMIDIInDevices();
