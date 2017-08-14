@@ -19,7 +19,7 @@ obtain(['serialport'], (com)=> {
     };
 
     _this.send = (arr) => {
-      arr.push(endBit);
+      arr.push(_this.endBit);
       if (_this.isOpen) ser.write(new Buffer(arr));
     };
 
