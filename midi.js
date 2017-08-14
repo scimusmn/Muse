@@ -88,6 +88,7 @@ obtain(['µ/utilities.js'], (utils)=> {
       _this.getMIDIInDevices();
       if (_this.devices.length > 0)
         _this.selectMIDIIn(_this.devices[0]);
+      _this.onReady();
     };
   };
 
