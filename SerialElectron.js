@@ -6,6 +6,9 @@ obtain(['serialport'], (com)=> {
 
     var _this = this;
     let ser = null;
+
+    _this.endBit = 124;
+
     _this.isOpen = false;
     _this.onConnect = () => {};
 
@@ -16,7 +19,7 @@ obtain(['serialport'], (com)=> {
     };
 
     _this.send = (arr) => {
-      arr.push(124);
+      arr.push(endBit);
       if (_this.isOpen) ser.write(new Buffer(arr));
     };
 
@@ -38,11 +41,11 @@ obtain(['serialport'], (com)=> {
       else _this.openByName(name, fxn);
     };
 
-    _this.openByName = (portName, fxn) => {
+    _this.openByName = (portName, fxn, baud = 115200) => {
       if (fxn) _this.onMessage = fxn;
       console.log('Opening serialport ' + portName);
       ser = new com(portName, {
-        baudrate: 115200,
+        baudrate: baud,
         parser: com.parsers.readline('\r\n', 'binary'),
         buffersize:bufSize,
       });
