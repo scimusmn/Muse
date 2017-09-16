@@ -5,6 +5,7 @@ obtain(['µ/utilities.js'], (utils)=> {
     var _this = this;
 
     var midiIn = null;
+    var midiOut = null;
 
     var noteHandlers = [];
 
@@ -24,6 +25,8 @@ obtain(['µ/utilities.js'], (utils)=> {
 
     _this.devices = null;
 
+    _this.pipe = null;
+
     _this.addNoteHandler = (note, cb)=> {
       noteHandlers[note] = cb;
     };
@@ -33,6 +36,8 @@ obtain(['µ/utilities.js'], (utils)=> {
       var channel = ev.data[0] & 0xf;
       var noteNumber = ev.data[1];
       var velocity = ev.data[2];
+
+      if (_this.pipe) _this.pipe(ev.data);
 
       if (channel == 9)
         return;
@@ -59,7 +64,7 @@ obtain(['µ/utilities.js'], (utils)=> {
       console.log('' + ev.data[0] + ' ' + ev.data[1] + ' ' + ev.data[2]);
     };
 
-    _this.getMIDIInDevices = ()=> {
+    _this.getDevices = ()=> {
       if (midiAccess) {
         _this.devices = [];
         if (midiIn && midiIn.state == 'disconnected') midiIn = null;
@@ -72,20 +77,20 @@ obtain(['µ/utilities.js'], (utils)=> {
       }
     };
 
-    _this.selectMIDIIn = (newIn)=> {
+    _this.select = (newIn)=> {
       if (midiIn) midiIn.onmidimessage = null;
       midiIn = newIn;
       if (midiIn) midiIn.onmidimessage = _this.onMessage;
     };
 
     _this.onStateChange = ()=> {
-      _this.getMIDIInDevices();
+      _this.getDevices();
     };
 
     _this.onReady = ()=> {};
 
     _this.init = ()=> {
-      _this.getMIDIInDevices();
+      _this.getDevices();
 
       //if (_this.devices.length > 0)
       //  _this.selectMIDIIn(_this.devices[0]);
@@ -93,7 +98,56 @@ obtain(['µ/utilities.js'], (utils)=> {
     };
   };
 
+  var outMidi = function() {
+    var _this = this;
+
+    _this.devices = null;
+    _this.onReady = ()=> {};
+
+    _this.send = (dataArray, timestamp = 0)=> {
+      if (midiOut) {
+        midiOut.send(dataArray, timestamp);
+      }
+    };
+
+    _this.getDevices = ()=> {
+      if (midiAccess) {
+        _this.devices = [];
+
+        //if (midiOut && midiOut.state == 'disconnected') midiOut = null;
+        var tmp = null;
+
+        for (let output of midiAccess.outputs.values()) {
+          //console.log(input);
+          _this.devices.push(output);
+        }
+      }
+    };
+
+    _this.select = (newOut)=> {
+      //if (midiOut) midiOut.onmidimessage = null;
+      midiOut = newOut;
+
+      //if (midiIn) midiIn.onmidimessage = _this.onMessage;
+    };
+
+    _this.playNote = (note, vel)=> {
+      midiOut.send([(9 << 4), note, vel]);
+      console.log('Sending ' + note + ' at ' + vel);
+    };
+
+    _this.init = ()=> {
+      _this.getDevices();
+      _this.onReady();
+    };
+
+    _this.onStateChange = ()=> {
+      _this.getDevices();
+    };
+  };
+
   exports.in = new inMidi();
+  exports.out = new outMidi();
 
   function midiConnectionStateChange(e) {
     console.log('connection: ' + e.port.name + ' ' + e.port.connection + ' ' + e.port.state);
@@ -101,6 +155,7 @@ obtain(['µ/utilities.js'], (utils)=> {
     //getMIDIInDevices();
 
     exports.in.onStateChange(e);
+    exports.out.onStateChange(e);
   }
 
   function onMIDIStarted(midi) {
@@ -112,6 +167,7 @@ obtain(['µ/utilities.js'], (utils)=> {
     midi.onstatechange = midiConnectionStateChange;
 
     exports.in.init();
+    exports.out.init();
   }
 
   function onMIDISystemError(err) {
