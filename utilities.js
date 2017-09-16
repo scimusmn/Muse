@@ -263,7 +263,7 @@ exports.map = (val, inMin, inMax, outMin, outMax)=> {
 };
 
 exports.clamp = (val, Min, Max)=> {
-  return Math.max(Min, min(val, Max));
+  return Math.max(Min, Math.min(val, Max));
 };
 
 exports.sign = (x)=> {
