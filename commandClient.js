@@ -41,7 +41,6 @@ obtain([], ()=> {
         {
           // Web Socket is connected, send data using send()
           clearInterval(_this.connectInterval);
-          _this.onConnect();
           ws.onmessage = function (evt) {
             var data = JSON.parse(evt.data);
             for (var key in data) {
@@ -58,6 +57,8 @@ obtain([], ()=> {
           _this.send = function (msgObj) {
             ws.send(JSON.stringify(msgObj));
           };
+
+          _this.onConnect();
 
           _this.synchronize();
         };
