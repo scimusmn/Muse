@@ -5,7 +5,7 @@ museDir = script.src.substr(0, script.src.lastIndexOf('/') + 1);
 if (museDir.includes('C:\\')) museDir = museDir.replace('file:///', '');
 if (require) museDir = museDir.replace('file://', '');
 
-window.µ = function(id, elem) {
+window.µ = function (id, elem) {
   var ret;
   var root = ((elem) ? elem : document);
   var spl = id.split('>');
@@ -21,17 +21,12 @@ window.µ = function(id, elem) {
       ret = root.querySelector(spl[0]);
       break;
     default:
-      ret = root.querySelectorAll(spl[0]);
+      ret = [].slice.call(root.querySelectorAll(spl[0]));
 
       //if(ret.length==1) ret = ret[0];
       //else{
-      ret.forEach = function(cb) {
-          for (let i = 0; i < ret.length; i++) {
-            cb(i, ret[i]);
-          }
-        };
 
-      ret.style = function(mem, val) {
+      ret.style = function (mem, val) {
           for (let i = 0; i < ret.length; i++) {
             ret[i].style[mem] = val;
           }
@@ -120,9 +115,9 @@ Number.prototype[µTrack] = function(params) {
   }
 }*/
 
-window.inheritFrom = function(parent, addMethods) {
+window.inheritFrom = function (parent, addMethods) {
   var _parent = parent;
-  var ret = function() {
+  var ret = function () {
     if (_parent) {
       _parent.apply(this, arguments);
     }
@@ -146,16 +141,16 @@ window.inheritFrom = function(parent, addMethods) {
   return ret;
 };
 
-window.get = function(url, params) {
+window.get = function (url, params) {
   // Return a new promise.
-  return new Promise(function(resolve, reject) {
+  return new Promise(function (resolve, reject) {
     // Do the usual XHR stuff
     var req = new XMLHttpRequest();
     if (params && params.type) req.responseType = params.type;
     if (params && params.credentials) req.open('GET', url, params.credentials);
     else req.open('GET', url);
 
-    req.onload = function() {
+    req.onload = function () {
       // This is called even on 404 etc
       // so check the status
       if (req.status == 200) {
@@ -169,7 +164,7 @@ window.get = function(url, params) {
     };
 
     // Handle network errors
-    req.onerror = function() {
+    req.onerror = function () {
       reject(Error('Network Error'));
     };
 
@@ -178,15 +173,15 @@ window.get = function(url, params) {
   });
 };
 
-window.post = function(url, obj) {
+window.post = function (url, obj) {
   // Return a new promise.
-  return new Promise(function(resolve, reject) {
+  return new Promise(function (resolve, reject) {
     // Do the usual XHR stuff
     var req = new XMLHttpRequest();
     req.open('POST', url);
     req.setRequestHeader('Content-type', 'application/json');
 
-    req.onload = function() {
+    req.onload = function () {
       // This is called even on 404 etc
       // so check the status
       if (req.status == 200) {
@@ -200,7 +195,7 @@ window.post = function(url, obj) {
     };
 
     // Handle network errors
-    req.onerror = function() {
+    req.onerror = function () {
       reject(Error('Network Error'));
     };
 
@@ -209,20 +204,20 @@ window.post = function(url, obj) {
   });
 };
 
-window.provide = function(exports) {
+window.provide = function (exports) {
 };
 
 window.obtain = (addr, func)=> {
   var _this = this;
   var objs = [];
   if (addr.length <= 0) func();
-  else addr.forEach(function(adr, ind, arr) {
+  else addr.forEach(function (adr, ind, arr) {
     let next = null;
     if (adr.includes('µ/')) adr = adr.replace('µ/', museDir);
     if (require) objs[ind] = require(adr);
     else get(adr).then((req)=> {
       if (req.responseURL.substr(0, location.origin.length) == location.origin) {
-        var provide = function(exps) {
+        var provide = function (exps) {
           if (exps.ready || exps.obtained) {
             if (exps) objs[ind] = exps;
             let check = true;
@@ -263,14 +258,14 @@ if (!window.customElements) {
   console.log('Webcomponents not natively supported.');
   var scrpt = document.createElement('script');
   scrpt.src = museDir + 'webcomponents-lite.js';
-  window.addEventListener('WebComponentsReady', function() {
+  window.addEventListener('WebComponentsReady', function () {
     console.log('Webcomponents provided through polyfill.');
     obtain([app], (imports)=> {
       if (!started) {
         started = true;
         console.log(document.readyState);
         if (document.readyState === 'complete' || document.readyState === 'loaded' || document.readyState === 'interactive') imports.app.start();
-        else document.addEventListener('DOMContentLoaded', function(event) {
+        else document.addEventListener('DOMContentLoaded', function (event) {
           imports.app.start();
         });
       }
@@ -283,7 +278,7 @@ if (!window.customElements) {
     if (!started) {
       started = true;
       if (document.readyState === 'complete' || document.readyState === 'loaded' || document.readyState === 'interactive') imports.app.start();
-      else document.addEventListener('DOMContentLoaded', function(event) {
+      else document.addEventListener('DOMContentLoaded', function (event) {
         imports.app.start();
       });
     }
