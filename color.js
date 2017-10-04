@@ -8,7 +8,7 @@ obtain([], ()=> {
 
     col.styleString = ()=>`rgb(${col[0]}, ${col[1]}, ${col[2]})`;
 
-    col.scale = (s)=>new Color(col.map((val)=>s * val));
+    col.scale = (s)=>new Color(col.map((val)=>Math.floor(s * val)));
 
     return col;
   }
