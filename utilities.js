@@ -1,6 +1,6 @@
 'use strict';
 
-Function.prototype.inherits = function(parent) {
+Function.prototype.inherits = function (parent) {
   this.prototype = Object.create(parent && parent.prototype, {
     constructor: {
       value: this,
@@ -12,9 +12,9 @@ Function.prototype.inherits = function(parent) {
   if (parent) this.__proto__ = parent;
 };
 
-exports.getCORS = function(url, params) {
+exports.getCORS = function (url, params) {
   // Return a new promise.
-  return new Promise(function(resolve, reject) {
+  return new Promise(function (resolve, reject) {
     // Do the usual XHR stuff
     var req = new XMLHttpRequest();
     if ('withCredentials' in req) {
@@ -32,7 +32,7 @@ exports.getCORS = function(url, params) {
 
     req.withCredentials = true;
 
-    req.onload = function() {
+    req.onload = function () {
       // This is called even on 404 etc
       // so check the status
       if (req.status == 200) {
@@ -46,7 +46,7 @@ exports.getCORS = function(url, params) {
     };
 
     // Handle network errors
-    req.onerror = function() {
+    req.onerror = function () {
       reject(Error('Network Error'));
     };
 
@@ -62,13 +62,13 @@ function loadFile(src, Fxn) {
 
   _this.loadFxns = [];
 
-  _this.onXMLLoad = function() {
+  _this.onXMLLoad = function () {
     for (var i = 0; i < _this.loadFxns.length; i++) {
       _this.loadFxns[i]();
     }
   };
 
-  _this.whenLoaded = function(fxn) {
+  _this.whenLoaded = function (fxn) {
     var _this = this;
     if (!_this.loaded) _this.loadFxns.push(fxn);
     else fxn();
@@ -76,7 +76,7 @@ function loadFile(src, Fxn) {
 
   http.open('get', src);
   http.responseType = 'document';
-  http.onreadystatechange = function() {
+  http.onreadystatechange = function () {
     if (http.readyState == 4) {
       _this.xml = http.responseXML;
       Fxn(_this.xml);
@@ -87,6 +87,13 @@ function loadFile(src, Fxn) {
 
   return this;
 }
+
+exports.round = function (number, precision) {
+    var factor = Math.pow(10, precision);
+    var tempNumber = number * factor;
+    var roundedTempNumber = Math.round(tempNumber);
+    return roundedTempNumber / factor;
+  };
 
 exports.transplant = (node)=> {
   var temp = node.cloneNode(true);
@@ -155,11 +162,11 @@ function b64toBlobURL(b64Data, contentType, sliceSize) {
   return URL.createObjectURL(blob);
 }
 
-var revokeBlobURL = function(URL) {
+var revokeBlobURL = function (URL) {
   window.URL.revokeObjectURL(URL);
 };
 
-exports.charCode = function(string) {
+exports.charCode = function (string) {
   return string.charCodeAt(0);
 };
 
@@ -169,7 +176,7 @@ exports.ajax = (src, fxn)=> {
 
   http.open('get', src);
   http.responseType = 'document';
-  http.onreadystatechange = function() {
+  http.onreadystatechange = function () {
     if (http.readyState == 4) {
       ret = http.responseXML;
       fxn(ret);
@@ -199,15 +206,15 @@ exports.distance = (p1, p2)=> {
   return Math.sqrt(Math.pow((p2.x - p1.x), 2) + Math.pow((p2.y - p1.y), 2));
 };
 
-Array.prototype.min = function() {
+Array.prototype.min = function () {
   return Math.min.apply({}, this);
 };
 
-Array.prototype.max = function() {
+Array.prototype.max = function () {
   return Math.max.apply({}, this);
 };
 
-Array.prototype.last = function() {
+Array.prototype.last = function () {
   return this[this.length - 1];
 };
 
@@ -217,7 +224,7 @@ exports.getPos = (el)=> {
   return { x: lx, y: ly };
 };
 
-exports.averager = function(points) {
+exports.averager = function (points) {
   if (points === undefined) points = 5;
   var samps = [];
   this.ave = 0;
@@ -228,7 +235,7 @@ exports.averager = function(points) {
   //  samps.push(0.0);
   //}
 
-  this.changeNumSamps = function(num) {
+  this.changeNumSamps = function (num) {
     samps.length = 0;
 
     //for (var i = 0; i < num; i++) {
@@ -237,12 +244,12 @@ exports.averager = function(points) {
     points = num;
   };
 
-  this.clear = function() {
+  this.clear = function () {
     samps.length = 0;
 
   };
 
-  this.addSample = function(val) {
+  this.addSample = function (val) {
     if (samps.length >= points) {
       tot -= samps[ind];
       samps[ind] = val;
@@ -277,7 +284,7 @@ exports.zeroPad = (num, size)=> {
 };
 
 exports.position = (elem)=> {
-  var offset = { x:0, y:0 };
+  var offset = { x: 0, y: 0 };
   while (elem)
   {
     offset.x += elem.offsetLeft;
