@@ -41,6 +41,16 @@ window.µ = function (id, elem) {
 
 window.µdir = museDir;
 
+window.loadCSS = (filename)=> {
+  if (!µ(`[href="${filename}"]`)[0]) {
+    var css = µ('+link', µ('head')[0]);
+    css.type = 'text/css';
+    css.rel = 'stylesheet';
+    css.media = 'screen,print';
+    css.href = filename;
+  }
+};
+
 /*Object.prototype.loadProperty = function(params) {
   var cur = params.default;
   get(params.url, { type: 'text' }).then(res=> {
