@@ -21,7 +21,7 @@ window.µ = function (id, elem) {
       ret = root.querySelector(spl[0]);
       break;
     default:
-      ret = [].slice.call(root.querySelectorAll(spl[0]));
+      ret = Array.from(root.querySelectorAll(spl[0]));
 
       //if(ret.length==1) ret = ret[0];
       //else{
@@ -50,6 +50,28 @@ window.loadCSS = (filename)=> {
     css.href = filename;
   }
 };
+
+window.importHTML = (address, cb)=> {
+  var targ = µ(`[href="${address}"]`)[0];
+  if (!targ) {
+    let link = µ('+link');
+    link.rel = 'import';
+    link.href = address;
+    //link.setAttribute('async', ''); // make it async!
+    link.addEventListener('load', ()=> { cb(link);});
+    //link.onerror = function(e) {...};
+    document.head.appendChild(link);
+  } else {
+    if (targ.import.childNodes.length) cb(targ);
+    else targ.addEventListener('load', ()=> { cb(targ);});
+  }
+
+};
+
+/*window.updateCSSProperty = (name, val)=> {
+  _this.style.removeProperty(name);
+  _this.style.setProperty(name, val);
+};*/
 
 /*Object.prototype.loadProperty = function(params) {
   var cur = params.default;
@@ -242,6 +264,7 @@ window.obtain = (addr, func)=> {
           }
         };
 
+        var dirname = `var __dirname = ${adr.substr(0, adr.lastIndexOf('/'))}`;
         var intro = '//# sourceURL=' + adr + '\n()=>{var exports = {src: "' + adr + '", ready: ';
         var re = /obtain\s*\(\s*\[/g;
         if (req.responseText.match(re)) {
