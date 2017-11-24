@@ -1,18 +1,18 @@
 'use strict';
 
 obtain(['serialport'], (com)=> {
-  exports.Serial = function (port, baudrate) {
+  exports.Serial = function (delim = '\r\n') {
 
     //const parser = new com.parsers.Regex({ regex: /[\r\n]+/ });
     //const parser = new com.parsers.ByteLength({ length: 8 });
-    const parser = new com.parsers.Readline({ delimiter: '\r\n' });
+    const parser = new com.parsers.Delimiter({ delimiter: delim });
 
     var _this = this;
     let ser = null;
     _this.isOpen = false;
     _this.onOpen = () => {};
 
-    _this.onMessage = () => {};
+    _this.onMessage = () => {console.log('test');};
 
     _this.onPortNotFound = function (ports) {
       console.log('Port not found');
@@ -29,9 +29,18 @@ obtain(['serialport'], (com)=> {
     var openByName = (portName, baud) => {
       console.log('Opening serialport ' + portName);
       ser = new com(portName, {
-        baudrate: baud,
+        baudRate: baud,
       });
 
+      /*let Pass = require('stream').PassThrough;
+
+      let b = Pass();
+
+      b.on('data', function (data) {
+        console.log('b1:', data);
+      });
+
+      ser.pipe(b);*/
       ser.pipe(parser);
 
       parser.on('data', function (data) {
