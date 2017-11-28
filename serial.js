@@ -57,22 +57,21 @@ obtain(['serialport'], (com)=> {
       });
     };
 
-    _this.open = (name, baud) => {
-      if (name[0] != '/')
-        com.list(function (err, ports) {
-          let found = false;
-          ports.forEach(function (port) {
-            if (port.comName.indexOf(name) > -1) {
-              name = port.comName;
-              found = true;
-              openByName(name, baud);
-            }
-          });
-
-          if (!found) _this.onPortNotFound(ports);
+    _this.open = (props) => {
+      var name = null;
+      com.list(function (err, ports) {
+        ports.forEach(function (port) {
+          console.log(port);
+          if (port.comName.includes(props.name) ||
+              (port.vendorId == props.vendorId && port.productId == props.productId) ||
+              port.manufacturer == props.manufacturer ||
+              port.serialNumber == props.serialNumber
+            ) name = port.comName;
         });
 
-      else openByName(name, baud);
+        if(!name) _this.onPortNotFound(ports);
+        else openByName(name, props.baud);
+      });
     };
 
   };
