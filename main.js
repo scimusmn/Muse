@@ -2,7 +2,8 @@ if (typeof require == 'undefined') var require = false;
 var museDir = '';
 let script = document.currentScript;
 museDir = script.src.substr(0, script.src.lastIndexOf('/') + 1);
-museDir = museDir.replace('file:///', '');
+if (museDir.includes('C:/') || museDir.includes('C:\\'))
+  museDir = museDir.replace('file:///', '');
 if (require) museDir = museDir.replace('file://', '');
 
 window.µ = function (id, elem) {
