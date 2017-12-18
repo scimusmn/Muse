@@ -69,7 +69,7 @@ obtain(['serialport'], (com)=> {
             ) name = port.comName;
         });
 
-        if(!name) _this.onPortNotFound(ports);
+        if (!name) _this.onPortNotFound(ports);
         else openByName(name, props.baud);
       });
     };

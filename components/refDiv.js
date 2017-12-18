@@ -1,6 +1,7 @@
-
 obtain([], ()=> {
   if (!customElements.get('ref-div')) {
+
+    //console.log('define importDoc');
 
     class RefDiv extends HTMLElement {
       constructor() {
@@ -12,11 +13,12 @@ obtain([], ()=> {
         this.fired = false;
       }
 
-      set onLoad(val) {
-        this.on_load = val;
-        if (this.loaded && !this.fired) {
-          this.on_load();
-          this.fired = true;
+      set onready(cb) {
+        //this.on_load = val;
+        if (this.loaded) {
+          cb();
+        } else {
+          this.addEventListener('ready', cb);
         }
       }
 
@@ -47,10 +49,11 @@ obtain([], ()=> {
 
             link.import.refDiv = _this;
 
-            if (link.import.onReady) link.import.onReady.call(this);
+            //if (link.import.onReady) link.import.onReady.call(this);
 
             _this.loaded = true;
-            this.on_load();
+            link.import.dispatchEvent(new CustomEvent('ready', { detail: _this }));
+            _this.dispatchEvent(new CustomEvent('ready', { detail: _this }));
           });
         }
       };
@@ -59,5 +62,20 @@ obtain([], ()=> {
     customElements.define('ref-div', RefDiv);
   }
 
+  var getImportDocument = function () {
+    var doc = document.currentScript.ownerDocument;
+    Object.defineProperty(doc, 'onready', {
+      set: function (value) {
+        if (doc.refDiv) {
+          cb();
+        } else {
+          this.addEventListener('ready', cb);
+        }
+      },
+    });
+    return doc;
+  };
+
   exports.RefDiv = customElements.get('ref-div');
+  exports.Setup = getImportDocument;
 });

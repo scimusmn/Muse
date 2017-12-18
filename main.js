@@ -240,10 +240,26 @@ window.post = function (url, obj) {
 window.provide = function (exports) {
 };
 
-window.obtain = (addr, func)=> {
+window.obtain = function (addr, func) {
   var _this = this;
   var objs = [];
-  if (addr.length <= 0) func();
+  var doc = document.currentScript.ownerDocument;
+  if (doc != document) {
+    Object.defineProperty(doc, 'onready', {
+      set: function (cb) {
+        if (doc.refDiv) {
+          cb({ detail: doc.refDiv });
+        } else {
+          this.addEventListener('ready', cb);
+        }
+      },
+    });
+  }
+
+  var defaultImports = {
+    Import: doc,
+  };
+  if (addr.length <= 0) func(defaultImports);
   else addr.forEach(function (adr, ind, arr) {
     let next = null;
     if (adr.includes('µ/')) adr = adr.replace('µ/', museDir);
@@ -260,6 +276,7 @@ window.obtain = (addr, func)=> {
             }
 
             if (check) {
+              objs.push(defaultImports);
               func.apply(null, objs);
             }
           }
@@ -281,6 +298,7 @@ window.obtain = (addr, func)=> {
     });
   });
 
+  objs.push(defaultImports);
   if (require && addr.length) func.apply(null, objs);
 };
 
@@ -294,7 +312,7 @@ if (!window.customElements) {
   scrpt.src = museDir + 'webcomponents-lite.js';
   window.addEventListener('WebComponentsReady', function () {
     console.log('Webcomponents provided through polyfill.');
-    obtain([app], (imports)=> {
+    obtain([app, 'µ/components/refDiv.js'], (imports)=> {
       if (!started) {
         started = true;
         console.log(document.readyState);
@@ -308,7 +326,7 @@ if (!window.customElements) {
 
   document.head.insertBefore(scrpt, document.currentScript);
 } else {
-  obtain([app], (imports)=> {
+  obtain([app, 'µ/components/refDiv.js'], (imports)=> {
     if (!started) {
       started = true;
       if (document.readyState === 'complete' || document.readyState === 'loaded' || document.readyState === 'interactive') imports.app.start();
