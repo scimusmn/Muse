@@ -104,13 +104,14 @@ obtain([], ()=> {
           };
 
           document.addEventListener('mousedown', (e)=> {
-            e.preventDefault();
-            if (this.open && e.target.parentElement != _this) this.open = false;
+            if (_this.open && e.target.parentElement != _this) {
+              e.preventDefault();
+              this.open = false;
+            }
           });
 
           document.addEventListener('mouseup', (e)=> {
-            e.preventDefault();
-            if (e.target.pressed && e.target.parentElement && e.target.parentElement.open) {
+            if (e.target.pressed && e.target.parentElement == _this && e.target.parentElement.open) {
               e.target.parentElement.open = false;
               e.target.parentElement.selected = e.target;
             }

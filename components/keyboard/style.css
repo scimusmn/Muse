@@ -67,6 +67,12 @@
   color: #000;
 }
 
+#keyboard .delSymbol {
+  pointer-events: none;
+  font-size: 2em;
+  --svg-src: url('assets/delete.svg');
+}
+
 .lastitem {
 margin-right: 0;
 }
