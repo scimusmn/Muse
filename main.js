@@ -244,7 +244,9 @@ window.obtain = function (addr, func) {
   var _this = this;
   var objs = [];
   var doc = document.currentScript.ownerDocument;
-  if (doc != document) {
+  var srcDir = document.currentScript.src;
+  var curDir = srcDir.substr(0, srcDir.lastIndexOf('/') + 1);
+  if (doc != document && !doc.onready) {
     Object.defineProperty(doc, 'onready', {
       set: function (cb) {
         if (doc.refDiv) {
@@ -253,6 +255,8 @@ window.obtain = function (addr, func) {
           this.addEventListener('ready', cb);
         }
       },
+
+      get: ()=>true,
     });
   }
 

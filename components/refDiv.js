@@ -22,13 +22,16 @@ obtain([], ()=> {
         }
       }
 
+      get onready () {
+        return true;
+      }
+
       connectedCallback() {
         //register events, check contents, etc.
 
         var _this = this;
         var src = µ('|>src', this);
 
-        console.log('link connected');
         if (src) {
           let curDir = this.baseURI.substr(0, this.baseURI.lastIndexOf('/'));
 
