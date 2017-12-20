@@ -63,9 +63,9 @@ obtain(['serialport'], (com)=> {
         ports.forEach(function (port) {
           console.log(port);
           if (port.comName.includes(props.name) ||
-              (port.vendorId == props.vendorId && port.productId == props.productId) ||
-              port.manufacturer == props.manufacturer ||
-              port.serialNumber == props.serialNumber
+              (port.manufacturer && props.manufacturer &&
+              port.manufacturer.toLowerCase() == props.manufacturer.toLowerCase()) ||
+              (port.serialNumber && port.serialNumber == props.serialNumber)
             ) name = port.comName;
         });
 
