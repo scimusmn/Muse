@@ -1,5 +1,5 @@
 
-#keyboard {
+key-board {
   position: absolute;
   bottom:0;
   margin: 0;
@@ -12,7 +12,7 @@
   border-top: solid 1px #777;
   --key-size: 5.75%;
 }
-#keyboard li {
+key-board li {
   float: left;
   margin: 0 5px 5px 0;
   width: var(--key-size);
@@ -25,44 +25,44 @@
   border-radius: .25em;
   box-sizing: border-box;
 }
-#keyboard li:active {
+key-board li:active {
   background-color: #07f;
   color: #000;
 }
 .capslock, .tab, .left-shift {
   clear: left;
 }
-#keyboard.shift li span.off {
+key-board.shift li span.off {
   display: none;
 }
-#keyboard.shift li span.on {
+key-board.shift li span.on {
   display: block;
 }
 
-#keyboard li span.on {
+key-board li span.on {
   display: none;
 }
-#keyboard li span.off {
+key-board li span.off {
   display: block;
 }
 
-#keyboard .tab, #keyboard .delete {
+key-board .tab, key-board .delete {
   width: calc(100% - ((var(--key-size) + 5px) * 13 + 5px));
 }
-#keyboard .capslock, #keyboard .return {
+key-board .capslock, key-board .return {
   width: calc(50% - ((var(--key-size) + 5px) * 5.5 + 5px));
 }
 
-#keyboard.capslock .capslock {
+key-board.capslock .capslock {
   background-color: #0f0;
   color: #000;
 }
 
-#keyboard .left-shift, #keyboard .right-shift {
+key-board .left-shift, key-board .right-shift {
   width: calc(50% - ((var(--key-size) + 5px) * 5 + 5px));
 }
 
-#keyboard.shift:not(.capslock) .left-shift, #keyboard.shift:not(.capslock) .right-shift {
+key-board.shift:not(.capslock) .left-shift, key-board.shift:not(.capslock) .right-shift {
   background-color: #0f0;
   color: #000;
 }
@@ -78,7 +78,7 @@
 	-webkit-mask-size: contain;
 }
 
-#keyboard .delSymbol {
+key-board .delSymbol {
   pointer-events: none;
   font-size: 2em;
   --svg-src: url('assets/delete.svg');
@@ -90,7 +90,7 @@ margin-right: 0;
 .uppercase .letter {
 text-transform: uppercase;
 }
-#keyboard .space {
+key-board .space {
   clear: left;
   width: calc(100% - 5px);
 }

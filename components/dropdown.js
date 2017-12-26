@@ -34,7 +34,7 @@ obtain([], ()=> {
       }
 
       get value() {
-        return this.selectedNode.value;
+        return this.selected && this.selected.value;
       }
 
       get selected() {
@@ -92,13 +92,11 @@ obtain([], ()=> {
           _this.display.textContent = µ('|>default', this);
 
           _this.onmousedown = (e)=> {
-            console.log('dropdown');
             e.preventDefault();
             _this.pressed = true;
           };
 
           _this.onmouseup = (e)=> {
-            console.log('dropdown');
             e.preventDefault();
             if (_this.pressed && !_this.disabled) _this.open = true;
           };

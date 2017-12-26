@@ -100,7 +100,7 @@ obtain([], ({ Import })=> {
 
         document.activeElement.dispatchEvent(eventObj);
 
-        if (shift && !capslock) shift = µ('#keyboard').classList.remove('shift');
+        if (shift && !capslock) shift = µ('#keyboard').classList.toggle('shift', false);
         if (capslock && !shift) shift = true, µ('#keyboard').classList.add('shift');
 
         µ('#keyboard').classList.toggle('uppercase', shift);
