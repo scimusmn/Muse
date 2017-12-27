@@ -25,10 +25,10 @@ obtain([], ()=> {
         //register events, check contents, etc.
         var _this = this;
 
-        if (!this.root) {
-          this.root = _this.attachShadow({ mode: 'open' });
+        if (!_this.root) {
+          _this.root = _this.attachShadow({ mode: 'open' });
 
-          this.root.innerHTML = `<style> @import "${dir}/css/button.css";</style>`;
+          _this.root.innerHTML = `<style> @import "${dir}/css/button.css";</style>`;
 
           _this.display = µ('+slot', _this.root);
 
