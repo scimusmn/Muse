@@ -316,7 +316,7 @@ if (!window.customElements) {
   scrpt.src = museDir + 'webcomponents-lite.js';
   window.addEventListener('WebComponentsReady', function () {
     console.log('Webcomponents provided through polyfill.');
-    obtain([app, 'µ/components/refDiv.js'], (imports)=> {
+    obtain([app], (imports)=> {
       if (!started) {
         started = true;
         console.log(document.readyState);
@@ -330,7 +330,7 @@ if (!window.customElements) {
 
   document.head.insertBefore(scrpt, document.currentScript);
 } else {
-  obtain([app, 'µ/components/refDiv.js'], (imports)=> {
+  obtain([app], (imports)=> {
     if (!started) {
       started = true;
       if (document.readyState === 'complete' || document.readyState === 'loaded' || document.readyState === 'interactive') imports.app.start();
