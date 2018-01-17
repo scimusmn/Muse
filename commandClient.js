@@ -34,6 +34,8 @@ obtain([], ()=> {
 
     this.send = function (msg) {};
 
+    this.getServerTime = ()=>Date.now() + _this.timeOffset;
+
     this.connect = function () {
       if ('WebSocket' in window) {
         ws = new WebSocket(_this.address);
