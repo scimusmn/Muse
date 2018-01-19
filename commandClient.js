@@ -8,6 +8,7 @@ obtain([], ()=> {
     var ws = null;
 
     _this.timeOffset = 0;
+    _this.connected = false;
 
     /*_this.synchronize = ()=> {
       var data = { time: Date.now() };
@@ -60,9 +61,10 @@ obtain([], ()=> {
             ws.send(JSON.stringify(msgObj));
           };
 
-          _this.onConnect();
+          if (!_this.connected) _this.onConnect();
 
           _this.synchronize();
+          _this.connected = true;
         };
 
         ws.onerror = function (error) {
@@ -73,6 +75,7 @@ obtain([], ()=> {
         };
 
         ws.onclose = function () {
+          _this.connected = false;
           clearInterval(_this.connectInterval);
           _this.connectInterval = setInterval(_this.connect, 2000);
         };
