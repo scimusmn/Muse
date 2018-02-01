@@ -50,7 +50,6 @@ obtain(['µ/serial.js'], (ser)=> {
     _this.onOpen = ()=> {};
 
     serial.onOpen = () => {
-      console.log('Started serial');
       _this.onOpen();
 
     };

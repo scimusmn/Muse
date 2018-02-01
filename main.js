@@ -6,6 +6,8 @@ if (museDir.includes('C:/') || museDir.includes('C:\\'))
   museDir = museDir.replace('file:///', '');
 if (require) museDir = museDir.replace('file://', '');
 
+
+////////////////// querySelector shortcut /////////////
 window.µ = function (id, elem) {
   var ret;
   var root = ((elem) ? elem : document);
@@ -24,14 +26,11 @@ window.µ = function (id, elem) {
     default:
       ret = Array.from(root.querySelectorAll(spl[0]));
 
-      //if(ret.length==1) ret = ret[0];
-      //else{
-
       ret.style = function (mem, val) {
-          for (let i = 0; i < ret.length; i++) {
-            ret[i].style[mem] = val;
-          }
-        };
+        for (let i = 0; i < ret.length; i++) {
+          ret[i].style[mem] = val;
+        }
+      };
 
       //}
       break;
@@ -73,80 +72,6 @@ window.importHTML = (address, cb)=> {
   _this.style.removeProperty(name);
   _this.style.setProperty(name, val);
 };*/
-
-/*Object.prototype.loadProperty = function(params) {
-  var cur = params.default;
-  get(params.url, { type: 'text' }).then(res=> {
-    cur = JSON.parse(res.responseText)[params.name];
-  });
-  Object.defineProperty(this, params.name, {
-    get: function() {
-      return cur;
-    },
-
-    set: function(val) {
-      cur = val;
-    },
-  });
-};*/
-
-/*window.µTrack = Symbol('trackChange');
-
-Number.prototype[µTrack] = function(params) {
-  this.trackObj = params.obj;
-  var oldValueOf = this.valueOf;
-  var oldStringOf = this.toString;
-  this.valueOf = function() {
-    console.log(this.trackObj[params.name] + ' is the current value ');
-    if (this.trackObj.obj[params.name]) return this.trackObj.obj[params.name];
-    else return this;
-  };
-
-  console.log(this.valueOf);
-
-  this.toString = function() {
-    if (this.trackObj.obj[params.name]) return this.trackObj.obj[params.name];
-    else return oldValueOf();
-  };
-};*/
-
-/*class Tracker extends Object {
-  constructor(args) {
-    super(args);
-    var _this = this;
-
-    this.primitive = null;
-    this.props = args.property.split('>');
-    if (typeof args.object !== 'undefined') {
-      this.tracked = args.object;
-    }
-
-    if (typeof args.default !== 'undefined') this.primitive = args.default;
-    if (typeof args.url !== 'undefined') {
-      this.tracked = null;
-      get(args.url, { type: 'text' }).then((req)=> {
-        _this.tracked = JSON.parse(req.responseText);
-      });
-    }
-  }
-
-  valueOf() {
-    if (this.tracked) {
-      var val = this.tracked;
-      for (let i = 0; i < this.props.length; i++) {
-        val = val[this.props[i]];
-      }
-
-      return val;
-    }
-
-    return this.primitive;
-  }
-
-  toString() {
-    return this.valueOf().toString();
-  }
-}*/
 
 window.inheritFrom = function (parent, addMethods) {
   var _parent = parent;
