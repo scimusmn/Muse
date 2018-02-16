@@ -11,19 +11,24 @@ obtain(obtains, (auth, google, MailComposer)=> {
     gmail = google.gmail({ version: 'v1', auth: oauth });
 
     exports.listMessages = (opts, cb, errCB)=> {
-      gmail.users.messages.list({
-        userId: 'me',
-        labelIds: opts.labels,
-        q: opts.queryString,
-      }, function (err, response) {
-        if (err) {
-          console.log('The API returned an error: ' + err);
-          if (errCB) errCB();
-          return;
-        }
+      try {
+        gmail.users.messages.list({
+          userId: 'me',
+          labelIds: opts.labels,
+          q: opts.queryString,
+        }, function (err, response) {
+          if (err) {
+            console.log('The API returned an error: ' + err);
+            if (errCB) errCB();
+            return;
+          }
 
-        cb(response);
-      });
+          cb(response.data);
+        });
+      } catch (e) {
+        //console.log(e);
+      }
+
     };
 
     exports.getMessage = function (msgId, cb) {
@@ -36,7 +41,7 @@ obtain(obtains, (auth, google, MailComposer)=> {
           return;
         }
 
-        cb(resp);
+        cb(resp.data);
       });
     };
 
@@ -79,7 +84,7 @@ obtain(obtains, (auth, google, MailComposer)=> {
           return;
         }
 
-        cb(response);
+        cb(response.data);
       });
     };
 
@@ -97,7 +102,7 @@ obtain(obtains, (auth, google, MailComposer)=> {
           return;
         }
 
-        if (cb) cb(response);
+        if (cb) cb(response.data);
       });
     };
   });

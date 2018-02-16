@@ -11,6 +11,15 @@ var SCOPES = ['https://www.googleapis.com/auth/drive',
              ];
 var TOKEN_DIR = (process.env.HOME || process.env.HOMEPATH ||
     process.env.USERPROFILE) + '/.credentials';
+
+try {
+  var config = require(`${TOKEN_DIR}/config.js`);
+  TOKEN_DIR += '/' + config.profile;
+  // do stuff
+} catch (ex) {
+  console.log('No credential configuration, using default.');
+}
+
 var TOKEN_PATH = `${TOKEN_DIR}/drive+sheets+gmail.json`;
 
 var oauth2Client = null;

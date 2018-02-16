@@ -57,7 +57,7 @@ obtain(obtains, (auth, google)=> {
           return;
         }
 
-        cb(response);
+        cb(response.data);
       });
     };
   });

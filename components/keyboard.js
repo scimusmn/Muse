@@ -157,4 +157,6 @@ obtain([`µ/components/museElement.js`], ({ MuseElement })=> {
   }
 
   exports.Keyboard = customElements.get('key-board');
+
+  provide(exports);
 });
