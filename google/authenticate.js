@@ -9,8 +9,11 @@ var SCOPES = ['https://www.googleapis.com/auth/drive',
               'https://www.googleapis.com/auth/gmail.modify',
               'https://www.googleapis.com/auth/spreadsheets',
              ];
-var TOKEN_DIR = (process.env.HOME || process.env.HOMEPATH ||
-    process.env.USERPROFILE) + '/.credentials';
+
+var basePath = (process.platform == 'linux') ? '/boot' : process.env.HOME || process.env.HOMEPATH ||
+    process.env.USERPROFILE;
+
+var TOKEN_DIR = basePath + '/.credentials';
 
 try {
   var config = require(`${TOKEN_DIR}/config.js`);
