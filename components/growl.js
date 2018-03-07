@@ -19,6 +19,7 @@ obtain([`${__dirname}/museElement.js`], ({ MuseElement })=> {
         this.className = type;
         this.persist = persist;
         if (this.alert && !this.classList.contains('alert_running') && !persist) {
+          clearTimeout(_this.alertTO);
           _this.alertTO = setTimeout(()=> {
             _this.alert = false;
           }, _this.displayTime);
