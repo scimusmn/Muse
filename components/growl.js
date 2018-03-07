@@ -34,7 +34,8 @@ obtain([`${__dirname}/museElement.js`], ({ MuseElement })=> {
         }
 
         _this.onAlert = ()=> {
-          setTimeout(()=> {
+          clearTimeout(_this.alertTO);
+          _this.alertTO = setTimeout(()=> {
             _this.alert = false;
           }, _this.displayTime);
         };
