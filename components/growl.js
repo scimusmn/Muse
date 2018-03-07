@@ -15,6 +15,7 @@ obtain([`${__dirname}/museElement.js`], ({ MuseElement })=> {
       }
 
       message(text, type, persist) {
+        var _this = this;
         this.display.textContent = text;
         this.className = type;
         this.persist = persist;
