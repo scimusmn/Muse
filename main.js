@@ -168,21 +168,24 @@ window.provide = function (exports) {
 window.obtain = function (addr, func) {
   var _this = this;
   var objs = [];
-  var doc = document.currentScript.ownerDocument;
-  var srcDir = document.currentScript.src;
-  var curDir = srcDir.substr(0, srcDir.lastIndexOf('/') + 1);
-  if (doc != document && !doc.onready) {
-    Object.defineProperty(doc, 'onready', {
-      set: function (cb) {
-        if (doc.refDiv) {
-          cb({ detail: doc.refDiv });
-        } else {
-          this.addEventListener('ready', cb);
-        }
-      },
+  var doc = document;
+  if (document.currentScript) {
+    doc = document.currentScript.ownerDocument;
+    var srcDir = document.currentScript.src;
+    var curDir = srcDir.substr(0, srcDir.lastIndexOf('/') + 1);
+    if (doc && doc != document && !doc.onready) {
+      Object.defineProperty(doc, 'onready', {
+        set: function (cb) {
+          if (doc.refDiv) {
+            cb({ detail: doc.refDiv });
+          } else {
+            this.addEventListener('ready', cb);
+          }
+        },
 
-      get: ()=>true,
-    });
+        get: ()=>true,
+      });
+    }
   }
 
   var defaultImports = {
