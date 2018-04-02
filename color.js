@@ -1,6 +1,13 @@
 obtain([], ()=> {
 
   function Color(col) {
+    if (typeof col == 'string') {
+      var tmp = col;
+      col = [];
+      col.push(parseInt(tmp.substr(0, 2), 16));
+      col.push(parseInt(tmp.substr(2, 2), 16));
+      col.push(parseInt(tmp.substr(4, 2), 16));
+    }
 
     col = col.map((val)=>Math.floor(val));
 
@@ -12,6 +19,20 @@ obtain([], ()=> {
 
     return col;
   }
+
+  exports.fadeColors = (col, current)=> {
+    if (current >= 1) current -= .0000000000001;
+    var space = 1 / (col.length - 1);
+    var which = Math.floor(current / space);
+    var amt = (current % space) / space;
+
+    var one = col[which];
+    var two = col[which + 1];
+
+    return new Color([one[0] * (1 - amt) + two[0] * amt,
+                     one[1] * (1 - amt) + two[1] * amt,
+                     one[2] * (1 - amt) + two[2] * amt, ]);
+  };
 
   exports.Color = Color;
 
