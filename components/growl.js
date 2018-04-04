@@ -14,10 +14,24 @@ obtain([`${__dirname}/museElement.js`], ({ MuseElement })=> {
         this.displayTime = 3000;
       }
 
-      message(text, type) {
+      message(text, type, persist) {
+        var _this = this;
         this.display.textContent = text;
         this.className = type;
+        this.persist = persist;
+        if (this.alert && !this.classList.contains('alert_running') && !persist) {
+          clearTimeout(_this.alertTO);
+          _this.alertTO = setTimeout(()=> {
+            _this.alert = false;
+          }, _this.displayTime);
+        }
+
         this.alert = true;
+      }
+
+      dismiss() {
+        this.persist = false;
+        this.alert = false;
       }
 
       connectedCallback() {
@@ -34,9 +48,12 @@ obtain([`${__dirname}/museElement.js`], ({ MuseElement })=> {
         }
 
         _this.onAlert = ()=> {
-          setTimeout(()=> {
-            _this.alert = false;
-          }, _this.displayTime);
+          clearTimeout(_this.alertTO);
+          if (!_this.persist) {
+            _this.alertTO = setTimeout(()=> {
+              _this.alert = false;
+            }, _this.displayTime);
+          }
         };
       };
     }

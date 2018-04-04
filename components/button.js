@@ -25,7 +25,7 @@ obtain([], ()=> {
         //register events, check contents, etc.
         var _this = this;
 
-        if (!_this.root) {
+        if (!_this.shadowRoot) {
           _this.root = _this.attachShadow({ mode: 'open' });
 
           _this.root.innerHTML = `<style> @import "${dir}/css/button.css";</style>`;

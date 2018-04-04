@@ -3,19 +3,31 @@ var readline = require('readline');
 var google = require('googleapis');
 var googleAuth = require('google-auth-library').OAuth2Client;
 
+if (!window) var window = global;
+
+if (!window.appDataDir)
+  window.appDataDir = (process.platform == 'linux') ? '/boot/appData' : '~';
+
 // If modifying these scopes, delete your previously saved credentials
 // at ~/.credentials/drive-nodejs-quickstart.json
 var SCOPES = ['https://www.googleapis.com/auth/drive',
               'https://www.googleapis.com/auth/gmail.modify',
               'https://www.googleapis.com/auth/spreadsheets',
              ];
-var TOKEN_DIR = (process.env.HOME || process.env.HOMEPATH ||
-    process.env.USERPROFILE) + '/.credentials';
+
+var TOKEN_DIR = window.appDataDir + '/.credentials';
+
+try {
+  var config = require(`${TOKEN_DIR}/config.js`);
+  TOKEN_DIR += '/' + config.profile;
+  // do stuff
+} catch (ex) {
+  console.log('No credential configuration, using default.');
+}
+
 var TOKEN_PATH = `${TOKEN_DIR}/drive+sheets+gmail.json`;
 
 var oauth2Client = null;
-
-if (!window) var window = global;
 
 var authCB = [];
 
