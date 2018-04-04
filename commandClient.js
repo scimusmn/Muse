@@ -31,6 +31,11 @@ obtain([], ()=> {
       listeners[evt] = cb;
     };
 
+    this.setId = (_id)=> {
+      _this.id = _id;
+      if (_this.send) _this.send({ _id: _id });
+    };
+
     this.onConnect = function () {};
 
     this.send = function (msg) {};
@@ -51,7 +56,7 @@ obtain([], ()=> {
                 if (key == 'serverTime') {
                   _this.timeOffset = (2 * data[key] - (_this.syncTime + Date.now())) / 2;
                   let serTime = new Date(Date.now() + _this.timeOffset);
-                  console.log('Server time is ' + serTime.toLocaleString());
+                  // /console.log('Server time is ' + serTime.toLocaleString());
                 } else if (key in listeners) listeners[key](data[key], data);
               }
             }
@@ -64,6 +69,7 @@ obtain([], ()=> {
           if (!_this.connected) _this.onConnect();
 
           _this.synchronize();
+          if (_this.id) _this.send({ _id: _this.id });
           _this.connected = true;
         };
 

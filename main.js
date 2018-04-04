@@ -6,7 +6,6 @@ if (museDir.includes('C:/') || museDir.includes('C:\\'))
   museDir = museDir.replace('file:///', '');
 if (require) museDir = museDir.replace('file://', '');
 
-
 ////////////////// querySelector shortcut /////////////
 window.µ = function (id, elem) {
   var ret;
@@ -168,9 +167,13 @@ window.provide = function (exports) {
 window.obtain = function (addr, func) {
   var _this = this;
   var objs = [];
-  var doc = document.currentScript.ownerDocument;
-  var srcDir = document.currentScript.src;
-  var curDir = srcDir.substr(0, srcDir.lastIndexOf('/') + 1);
+  var doc = document;
+  if (document.currentScript) {
+    var doc = document.currentScript.ownerDocument;
+    var srcDir = document.currentScript.src;
+    var curDir = srcDir.substr(0, srcDir.lastIndexOf('/') + 1);
+  }
+
   if (doc != document && !doc.onready) {
     Object.defineProperty(doc, 'onready', {
       set: function (cb) {

@@ -81,4 +81,6 @@ obtain([], ()=> {
 
   exports.RefDiv = customElements.get('ref-div');
   exports.Setup = getImportDocument;
+
+  provide(exports);
 });
