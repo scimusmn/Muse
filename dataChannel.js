@@ -46,10 +46,9 @@ obtain([], ()=> {
       _this.remoteId = remoteId;
       getChannel(this.cnxn.createDataChannel('channelName'));
 
-      if (_this.receivedCandidates) {
-        console.log('got candidates');
+      _this.cnxn.onnegotiationneeded = function () {
         _this.cnxn.createOffer(localDesc, logError);
-      } else _this.attemptConnect = true;
+      };
     };
 
     function logError(error) {
@@ -70,7 +69,6 @@ obtain([], ()=> {
     };
 
     _this.cnxn.onicecandidate = (evt)=> {
-      console.log(evt.candidate);
       signal.send({ connect: {
         origin: signal.id,
         target: _this.remoteId,
@@ -106,8 +104,7 @@ obtain([], ()=> {
       if (!_this.remoteId) _this.remoteId = data.origin;
       _this.cnxn.addIceCandidate(new RTCIceCandidate(data.candidate));
       if (!data.candidate) {
-        _this.receivedCandidates = true;
-        if (_this.attemptConnect) _this.cnxn.createOffer(localDesc, logError);
+
       }
     });
 
