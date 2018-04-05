@@ -3,7 +3,7 @@ obtain([], ()=> {
     var _this = this;
 
     var listeners = {};
-    this.address = 'ws://' + address + ':8080/';
+    this.address = 'ws://' + address + ':80/';
     this.connectInterval = null;
     var ws = null;
 
@@ -66,6 +66,10 @@ obtain([], ()=> {
             ws.send(JSON.stringify(msgObj));
           };
 
+          _this.close = ()=> {
+            ws.close();
+          };
+
           if (!_this.connected) _this.onConnect();
 
           _this.synchronize();
@@ -82,8 +86,8 @@ obtain([], ()=> {
 
         ws.onclose = function () {
           _this.connected = false;
-          clearInterval(_this.connectInterval);
-          _this.connectInterval = setInterval(_this.connect, 2000);
+          /*clearInterval(_this.connectInterval);
+          _this.connectInterval = setInterval(_this.connect, 2000);*/
         };
       }    else {
         clearInterval(_this.connectInterval);
