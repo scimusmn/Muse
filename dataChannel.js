@@ -69,11 +69,7 @@ obtain([], ()=> {
     };
 
     _this.cnxn.onicecandidate = (evt)=> {
-      //console.log(evt.candidate);
-      if (!evt.candidate) {
-        _this.cnxn.createOffer(localDesc, logError);
-      }
-
+      if (!evt.candidate) _this.lastCandidate = true;
       signal.send({ connect: {
         origin: signal.id,
         target: _this.remoteId,
@@ -83,7 +79,7 @@ obtain([], ()=> {
 
     var localDesc = (desc)=> {
       _this.cnxn.setLocalDescription(desc, function () {
-        console.log(_this.cnxn.localDescription);
+        //console.log(_this.cnxn.localDescription);
         signal.send({ offer: {
           origin: signal.id,
           target: _this.remoteId,
@@ -108,7 +104,7 @@ obtain([], ()=> {
     signal.addListener('connect', (data)=> {
       if (!_this.remoteId) _this.remoteId = data.origin;
       if (data.candidate) _this.cnxn.addIceCandidate(new RTCIceCandidate(data.candidate));
-      //else _this.cnxn.createOffer(localDesc, logError);
+      else if (_this.lastCandidate) _this.cnxn.createOffer(localDesc, logError);
     });
 
     signal.addListener('error', (errStr)=> {
