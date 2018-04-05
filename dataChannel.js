@@ -78,11 +78,11 @@ obtain([], ()=> {
         }, });
       }
 
-      signal.send({ connect: {
+      /*signal.send({ connect: {
         origin: signal.id,
         target: _this.remoteId,
         candidate: evt.candidate,
-      }, });
+      }, });*/
     };
 
     var localDesc = (desc)=> {
