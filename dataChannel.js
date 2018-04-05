@@ -61,7 +61,7 @@ obtain([], ()=> {
       },],
     };
 
-    this.cnxn = new RTCPeerConnection(configuration);
+    this.cnxn = new RTCPeerConnection();
 
     _this.cnxn.ondatachannel = (event)=> {
       console.log('got data channel');
@@ -69,6 +69,7 @@ obtain([], ()=> {
     };
 
     _this.cnxn.onicecandidate = (evt)=> {
+      console.log(evt.candidate);
       signal.send({ connect: {
         origin: signal.id,
         target: _this.remoteId,
@@ -103,7 +104,7 @@ obtain([], ()=> {
     signal.addListener('connect', (data)=> {
       if (!_this.remoteId) _this.remoteId = data.origin;
       if (data.candidate) _this.cnxn.addIceCandidate(new RTCIceCandidate(data.candidate));
-
+      else _this.cnxn.createOffer(localDesc, logError);
     });
 
     signal.addListener('error', (errStr)=> {
