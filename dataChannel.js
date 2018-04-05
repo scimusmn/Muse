@@ -47,7 +47,7 @@ obtain([], ()=> {
       getChannel(this.cnxn.createDataChannel('channelName'));
 
       _this.cnxn.onnegotiationneeded = function () {
-        _this.cnxn.createOffer(localDesc, logError);
+        // _this.cnxn.createOffer(localDesc, logError);
       };
     };
 
@@ -69,12 +69,14 @@ obtain([], ()=> {
     };
 
     _this.cnxn.onicecandidate = (evt)=> {
-      console.log(evt.candidate);
-      signal.send({ connect: {
+      if (!evt.candidate) {
+        _this.cnxn.createOffer(localDesc, logError);
+      }
+      /*signal.send({ connect: {
         origin: signal.id,
         target: _this.remoteId,
         candidate: evt.candidate,
-      }, });
+      }, });*/
     };
 
     var localDesc = (desc)=> {
@@ -104,7 +106,7 @@ obtain([], ()=> {
     signal.addListener('connect', (data)=> {
       if (!_this.remoteId) _this.remoteId = data.origin;
       if (data.candidate) _this.cnxn.addIceCandidate(new RTCIceCandidate(data.candidate));
-      else _this.cnxn.createOffer(localDesc, logError);
+      //else _this.cnxn.createOffer(localDesc, logError);
     });
 
     signal.addListener('error', (errStr)=> {
