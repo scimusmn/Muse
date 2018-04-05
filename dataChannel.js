@@ -102,10 +102,8 @@ obtain([], ()=> {
 
     signal.addListener('connect', (data)=> {
       if (!_this.remoteId) _this.remoteId = data.origin;
-      _this.cnxn.addIceCandidate(new RTCIceCandidate(data.candidate));
-      if (!data.candidate) {
+      if (data.candidate) _this.cnxn.addIceCandidate(new RTCIceCandidate(data.candidate));
 
-      }
     });
 
     signal.addListener('error', (errStr)=> {
