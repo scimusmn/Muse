@@ -57,6 +57,8 @@ obtain([], ()=> {
             data: data,
           }, });
         };
+
+        _this.onConnect();
       }
     };
 
@@ -92,6 +94,7 @@ obtain([], ()=> {
       if (_this.cnxn.iceConnectionState == 'failed') {
         console.log('failed to find candidates, reverting to backup');
         _this.useSignal = true;
+        getChannel(signal);
       }
     };
 
