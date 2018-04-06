@@ -67,24 +67,26 @@ obtain([], ()=> {
     };
 
     _this.cnxn.onicecandidate = (evt)=> {
-      console.log(evt.candidate);
-      if (evt.candidate);
-        // signal.send({ connect: {
-        //   origin: signal.id,
-        //   target: _this.remoteId,
-        //   candidate: evt.candidate,
-        // }, });
+      console.log(evt && evt.candidate);
+      if (evt.candidate)
+        signal.send({ connect: {
+          origin: signal.id,
+          target: _this.remoteId,
+          candidate: evt.candidate,
+        }, });
       else _this.cnxn.createOffer(localDesc, logError);
     };
 
     var localDesc = (desc)=> {
-      _this.cnxn.setLocalDescription(desc, function () {
-        signal.send({ offer: {
-          origin: signal.id,
-          target: _this.remoteId,
-          sdp: _this.cnxn.localDescription,
-        }, });
-      }, logError);
+      _this.cnxn.setLocalDescription(desc)
+        .then(()=> {
+          signal.send({ offer: {
+            origin: signal.id,
+            target: _this.remoteId,
+            sdp: _this.cnxn.localDescription,
+          }, });
+        })
+        .catch(logError);
     };
 
     /*_this.cnxn.onnegotiationneeded = function () {
@@ -93,11 +95,13 @@ obtain([], ()=> {
 
     signal.addListener('offer', (data)=> {
       if (!_this.remoteId) _this.remoteId = data.origin;
-      _this.cnxn.setRemoteDescription(new RTCSessionDescription(data.sdp), function () {
+      _this.cnxn.setRemoteDescription(new RTCSessionDescription(data.sdp))
+      .then(()=> {
         // if we received an offer, we need to answer
         if (_this.cnxn.remoteDescription.type == 'offer')
           _this.cnxn.createAnswer(localDesc, logError);
-      }, logError);
+      })
+      .catch(logError);
     });
 
     signal.addListener('connect', (data)=> {
