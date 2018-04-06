@@ -3,7 +3,7 @@ obtain([], ()=> {
     var _this = this;
 
     var listeners = {};
-    this.address = 'ws://' + address + ':80/';
+    this.address = 'ws://' + address;
     this.connectInterval = null;
     var ws = null;
 
