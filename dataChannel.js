@@ -56,7 +56,7 @@ obtain([], ()=> {
     var configuration = {
       iceServers: [{
         urls: 'stun:stun2.l.google.com:19302',
-      }, ],
+      },],
     };
 
     this.cnxn = new RTCPeerConnection(configuration);
@@ -67,12 +67,14 @@ obtain([], ()=> {
     };
 
     _this.cnxn.onicecandidate = (evt)=> {
-      if (evt.candidate)
-        signal.send({ connect: {
-          origin: signal.id,
-          target: _this.remoteId,
-          candidate: evt.candidate,
-        }, });
+      console.log(evt.candidate);
+      if (evt.candidate);
+        // signal.send({ connect: {
+        //   origin: signal.id,
+        //   target: _this.remoteId,
+        //   candidate: evt.candidate,
+        // }, });
+      else _this.cnxn.createOffer(localDesc, logError);
     };
 
     var localDesc = (desc)=> {
