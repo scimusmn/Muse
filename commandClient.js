@@ -86,6 +86,7 @@ obtain([], ()=> {
 
         ws.onclose = function () {
           _this.connected = false;
+          console.log('disconnected');
           /*clearInterval(_this.connectInterval);
           _this.connectInterval = setInterval(_this.connect, 2000);*/
         };
