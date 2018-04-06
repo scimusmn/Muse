@@ -56,7 +56,7 @@ obtain([], ()=> {
     var configuration = {
       iceServers: [{
         urls: 'stun:stun2.l.google.com:19302',
-      },],
+      }, ],
     };
 
     this.cnxn = new RTCPeerConnection(configuration);
@@ -77,6 +77,8 @@ obtain([], ()=> {
     };
 
     var localDesc = (desc)=> {
+      console.log('created local description:');
+      console.log(_this.cnxn.localDescription);
       _this.cnxn.setLocalDescription(desc)
         .then(()=> {
           signal.send({ offer: {
@@ -93,6 +95,8 @@ obtain([], ()=> {
     };*/
 
     signal.addListener('offer', (data)=> {
+      console.log('got remote description:');
+      console.log(data.sdp);
       if (!_this.remoteId) _this.remoteId = data.origin;
       _this.cnxn.setRemoteDescription(new RTCSessionDescription(data.sdp))
       .then(()=> {
