@@ -80,7 +80,7 @@ obtain([], ()=> {
     var configuration = {
       iceServers: [{
         urls: 'stun:stun2.l.google.com:19302',
-      }, ],
+      },],
     };
 
     this.cnxn = new RTCPeerConnection(configuration);
@@ -91,9 +91,11 @@ obtain([], ()=> {
     };
 
     _this.cnxn.oniceconnectionstatechange = ()=> {
+      console.log(_this.cnxn.iceConnectionState);
       if (_this.cnxn.iceConnectionState == 'failed') {
         console.log('failed to find candidates, reverting to backup');
         _this.useSignal = true;
+        _this.connected = true;
         getChannel(signal);
       }
     };
