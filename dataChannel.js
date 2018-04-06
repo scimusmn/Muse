@@ -17,28 +17,47 @@ obtain([], ()=> {
 
     var getChannel = (channel)=> {
       console.log('getting channel');
-      _this.channel = channel;
 
-      _this.channel.onopen = ()=> {
-        _this.onConnect();
-      };
+      if (channel != signal) {
+        _this.channel = channel;
+        _this.channel.onopen = ()=> {
+          _this.onConnect();
+        };
 
-      _this.channel.onclose = ()=> {
-        _this.onClose();
-      };
+        _this.channel.onclose = ()=> {
+          _this.onClose();
+        };
 
-      _this.channel.onmessage = function (evt) {
-        var data = JSON.parse(evt.data);
-        for (var key in data) {
-          if (data.hasOwnProperty(key)) {
-            if (key in listeners) listeners[key](data[key], data);
+        _this.channel.onmessage = function (evt) {
+          var data = JSON.parse(evt.data);
+          for (var key in data) {
+            if (data.hasOwnProperty(key)) {
+              if (key in listeners) listeners[key](data[key], data);
+            }
           }
-        }
-      };
+        };
 
-      _this.send = (msg)=> {
-        _this.channel.send(JSON.stringify(msg));
-      };
+        _this.send = (msg)=> {
+          _this.channel.send(JSON.stringify(msg));
+        };
+      } else {
+        _this.channel = {};
+
+        signal.addListener('relay', (data)=> {
+          for (var key in data) {
+            if (data.hasOwnProperty(key)) {
+              if (key in listeners) listeners[key](data[key], data);
+            }
+          }
+        });
+
+        _this.send = (data)=> {
+          signal.send({ relay: {
+            toId: _this.remoteId,
+            data: data,
+          }, });
+        };
+      }
     };
 
     _this.connect = (remoteId)=> {
@@ -59,7 +78,7 @@ obtain([], ()=> {
     var configuration = {
       iceServers: [{
         urls: 'stun:stun2.l.google.com:19302',
-      },],
+      }, ],
     };
 
     this.cnxn = new RTCPeerConnection(configuration);
@@ -70,7 +89,10 @@ obtain([], ()=> {
     };
 
     _this.cnxn.oniceconnectionstatechange = ()=> {
-      console.log(_this.cnxn.iceConnectionState);
+      if (_this.cnxn.iceConnectionState == 'failed') {
+        console.log('failed to find candidates, reverting to backup');
+        _this.useSignal = true;
+      }
     };
 
     _this.cnxn.onicecandidate = (evt)=> {
