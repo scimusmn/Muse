@@ -77,10 +77,10 @@ obtain([], ()=> {
     };
 
     var localDesc = (desc)=> {
-      console.log('created local description:');
-      console.log(_this.cnxn.localDescription);
       _this.cnxn.setLocalDescription(desc)
         .then(()=> {
+          console.log('created local description:');
+          console.log(_this.cnxn.localDescription);
           signal.send({ offer: {
             origin: signal.id,
             target: _this.remoteId,
