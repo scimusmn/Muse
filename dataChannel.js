@@ -57,10 +57,10 @@ obtain([], ()=> {
     var configuration = {
       iceServers: [{
         urls: 'stun:stun2.l.google.com:19302',
-      },],
+      }, ],
     };
 
-    this.cnxn = new RTCPeerConnection(null);
+    this.cnxn = new RTCPeerConnection(configuration);
 
     _this.cnxn.ondatachannel = (event)=> {
       console.log('got data channel');
@@ -103,16 +103,16 @@ obtain([], ()=> {
       _this.cnxn.setRemoteDescription(new RTCSessionDescription(data.sdp))
       .then(()=> {
         // if we received an offer, we need to answer
-        console.log('creating answer');
-        if (_this.cnxn.remoteDescription.type == 'offer')
+        if (_this.cnxn.remoteDescription.type == 'offer') {
+          console.log('creating answer');
           _this.cnxn.createAnswer().then(localDesc).catch(logError);
+        }
       })
       .catch(logError);
     });
 
     signal.addListener('connect', (data)=> {
-      if (!_this.remoteId) _this.remoteId = data.origin;
-      if (data.candidate) _this.cnxn.addIceCandidate(new RTCIceCandidate(data.candidate));
+      _this.cnxn.addIceCandidate(new RTCIceCandidate(data.candidate));
     });
 
     //stun.l.google.com:19302
