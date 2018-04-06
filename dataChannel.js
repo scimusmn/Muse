@@ -92,7 +92,9 @@ obtain([], ()=> {
 
     _this.cnxn.oniceconnectionstatechange = ()=> {
       console.log(_this.cnxn.iceConnectionState);
-      if (_this.cnxn.iceConnectionState == 'failed') {
+      if (_this.cnxn.iceConnectionState == 'connected') {
+        _this.connected = true;
+      }else if (_this.cnxn.iceConnectionState == 'failed' && !_this.connected) {
         console.log('failed to find candidates, reverting to backup');
         _this.useSignal = true;
         _this.connected = true;
