@@ -57,10 +57,10 @@ obtain([], ()=> {
     var configuration = {
       iceServers: [{
         urls: 'stun:stun2.l.google.com:19302',
-      }, ],
+      },],
     };
 
-    this.cnxn = new RTCPeerConnection(configuration);
+    this.cnxn = new RTCPeerConnection(null);
 
     _this.cnxn.ondatachannel = (event)=> {
       console.log('got data channel');
