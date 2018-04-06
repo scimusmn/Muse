@@ -80,7 +80,7 @@ obtain([], ()=> {
     var configuration = {
       iceServers: [{
         urls: 'stun:stun2.l.google.com:19302',
-      },],
+      }, ],
     };
 
     this.cnxn = new RTCPeerConnection(configuration);
