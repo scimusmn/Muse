@@ -98,15 +98,15 @@ obtain([], ()=> {
 
     signal.addListener('offer', (data)=> {
       console.log('got remote description:');
-      console.log(data.sdp);
-      if (!_this.remoteId) _this.remoteId = data.origin;
+      console.log(data);
+      /*if (!_this.remoteId) _this.remoteId = data.origin;
       _this.cnxn.setRemoteDescription(new RTCSessionDescription(data.sdp))
       .then(()=> {
         // if we received an offer, we need to answer
         if (_this.cnxn.remoteDescription.type == 'offer')
           _this.cnxn.createAnswer().then(localDesc).catch(logError);
       })
-      .catch(logError);
+      .catch(logError);*/
     });
 
     signal.addListener('connect', (data)=> {
