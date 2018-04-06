@@ -90,11 +90,11 @@ obtain([], ()=> {
         .then(()=> {
           console.log('sending local description:');
           console.log(_this.cnxn.localDescription);
-          signal.send({ offer: {
+          /*signal.send({ offer: {
             origin: signal.id,
             target: _this.remoteId,
             sdp: _this.cnxn.localDescription,
-          }, });
+          }, });*/
         })
         .catch(logError);
     };
