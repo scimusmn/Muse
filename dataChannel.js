@@ -10,8 +10,6 @@ obtain([], ()=> {
 
     _this.onClose = ()=> {};
 
-    _this.onBadCandidates = ()=> {};
-
     _this.addListener = (evt, cb)=> {
       listeners[evt] = cb;
     };
@@ -58,7 +56,7 @@ obtain([], ()=> {
     var configuration = {
       iceServers: [{
         urls: 'stun:stun2.l.google.com:19302',
-      },],
+      }, ],
     };
 
     this.cnxn = new RTCPeerConnection(configuration);
@@ -69,25 +67,21 @@ obtain([], ()=> {
     };
 
     _this.cnxn.onicecandidate = (evt)=> {
-      if (!evt.candidate) _this.lastCandidate = true;
-      signal.send({ connect: {
-        origin: signal.id,
-        target: _this.remoteId,
-        candidate: evt.candidate,
-      }, });
+      if (evt.candidate)
+        signal.send({ connect: {
+          origin: signal.id,
+          target: _this.remoteId,
+          candidate: evt.candidate,
+        }, });
     };
 
     var localDesc = (desc)=> {
       _this.cnxn.setLocalDescription(desc, function () {
-        //console.log(_this.cnxn.localDescription);
-        if (_this.lastCandidate) {
-          signal.send({ offer: {
-            origin: signal.id,
-            target: _this.remoteId,
-            sdp: _this.cnxn.localDescription,
-          }, });
-        }
-
+        signal.send({ offer: {
+          origin: signal.id,
+          target: _this.remoteId,
+          sdp: _this.cnxn.localDescription,
+        }, });
       }, logError);
     };
 
@@ -106,8 +100,7 @@ obtain([], ()=> {
 
     signal.addListener('connect', (data)=> {
       if (!_this.remoteId) _this.remoteId = data.origin;
-      if (data.candidate) _this.cnxn.addIceCandidate(new RTCIceCandidate(data.candidate));
-      else if (_this.lastCandidate) _this.cnxn.createOffer(localDesc, logError);
+      _this.cnxn.addIceCandidate(new RTCIceCandidate(data.candidate));
     });
 
     signal.addListener('error', (errStr)=> {
