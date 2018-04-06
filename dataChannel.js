@@ -48,6 +48,8 @@ obtain([], ()=> {
       _this.cnxn.onnegotiationneeded = function () {
         _this.cnxn.createOffer().then(localDesc).catch(logError);
       };
+
+      _this.supplicant = true;
     };
 
     function logError(error) {
@@ -57,7 +59,7 @@ obtain([], ()=> {
     var configuration = {
       iceServers: [{
         urls: 'stun:stun2.l.google.com:19302',
-      }, ],
+      },],
     };
 
     this.cnxn = new RTCPeerConnection(configuration);
@@ -76,7 +78,7 @@ obtain([], ()=> {
         //   target: _this.remoteId,
         //   candidate: evt.candidate,
         // }, });
-      else {
+      else if (supplicant) {
         signal.send({ offer: {
           origin: signal.id,
           target: _this.remoteId,
