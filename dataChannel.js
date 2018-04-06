@@ -70,19 +70,12 @@ obtain([], ()=> {
     _this.cnxn.onicecandidate = (evt)=> {
       console.log('found ice candidate:');
       console.log(evt && evt.candidate);
-      //if (evt.candidate)
-      // signal.send({ connect: {
-      //   origin: signal.id,
-      //   target: _this.remoteId,
-      //   candidate: evt.candidate,
-      // }, });
-      if (!evt.candidate && _this.cnxn.localDescription) {
-        signal.send({ offer: {
+      if (evt.candidate)
+        signal.send({ connect: {
           origin: signal.id,
           target: _this.remoteId,
-          sdp: _this.cnxn.localDescription,
+          candidate: evt.candidate,
         }, });
-      }
     };
 
     var localDesc = (desc)=> {
@@ -90,11 +83,11 @@ obtain([], ()=> {
         .then(()=> {
           console.log('sending local description:');
           console.log(_this.cnxn.localDescription);
-          // signal.send({ offer: {
-          //   origin: signal.id,
-          //   target: _this.remoteId,
-          //   sdp: _this.cnxn.localDescription,
-          // }, });
+          signal.send({ offer: {
+            origin: signal.id,
+            target: _this.remoteId,
+            sdp: _this.cnxn.localDescription,
+          }, });
         })
         .catch(logError);
     };
