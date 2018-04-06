@@ -59,7 +59,7 @@ obtain([], ()=> {
     var configuration = {
       iceServers: [{
         urls: 'stun:stun2.l.google.com:19302',
-      },],
+      }, ],
     };
 
     this.cnxn = new RTCPeerConnection(configuration);
@@ -78,7 +78,7 @@ obtain([], ()=> {
         //   target: _this.remoteId,
         //   candidate: evt.candidate,
         // }, });
-      else if (supplicant) {
+      else if (_this.supplicant) {
         signal.send({ offer: {
           origin: signal.id,
           target: _this.remoteId,
