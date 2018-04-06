@@ -56,7 +56,7 @@ obtain([], ()=> {
     var configuration = {
       iceServers: [{
         urls: 'stun:stun2.l.google.com:19302',
-      }, ],
+      },],
     };
 
     this.cnxn = new RTCPeerConnection(configuration);
@@ -74,7 +74,6 @@ obtain([], ()=> {
           target: _this.remoteId,
           candidate: evt.candidate,
         }, });
-      else _this.cnxn.createOffer(localDesc, logError);
     };
 
     var localDesc = (desc)=> {
