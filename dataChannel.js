@@ -45,7 +45,7 @@ obtain([], ()=> {
       getChannel(this.cnxn.createDataChannel('channelName'));
 
       _this.cnxn.onnegotiationneeded = function () {
-        _this.cnxn.createOffer(localDesc, logError);
+        _this.cnxn.createOffer().then(localDesc).catch(logError);
       };
     };
 
@@ -56,7 +56,7 @@ obtain([], ()=> {
     var configuration = {
       iceServers: [{
         urls: 'stun:stun2.l.google.com:19302',
-      }, ],
+      },],
     };
 
     this.cnxn = new RTCPeerConnection(configuration);
@@ -67,6 +67,7 @@ obtain([], ()=> {
     };
 
     _this.cnxn.onicecandidate = (evt)=> {
+      console.log('found ice candidate:');
       console.log(evt && evt.candidate);
       if (evt.candidate)
         signal.send({ connect: {
@@ -79,7 +80,7 @@ obtain([], ()=> {
     var localDesc = (desc)=> {
       _this.cnxn.setLocalDescription(desc)
         .then(()=> {
-          console.log('created local description:');
+          console.log('sending local description:');
           console.log(_this.cnxn.localDescription);
           signal.send({ offer: {
             origin: signal.id,
@@ -102,7 +103,7 @@ obtain([], ()=> {
       .then(()=> {
         // if we received an offer, we need to answer
         if (_this.cnxn.remoteDescription.type == 'offer')
-          _this.cnxn.createAnswer(localDesc, logError);
+          _this.cnxn.createAnswer().then(localDesc).catch(logError);
       })
       .catch(logError);
     });
