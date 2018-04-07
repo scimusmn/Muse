@@ -66,11 +66,15 @@ obtain([], ()=> {
       _this.remoteId = remoteId;
       getChannel(this.cnxn.createDataChannel('channelName'));
 
-      _this.cnxn.onnegotiationneeded = function () {
-        _this.cnxn.createOffer().then(localDesc).catch(logError);
-      };
+      //_this.cnxn.onnegotiationneeded = function () {
+      _this.cnxn.createOffer().then(localDesc).catch(logError);
+      //};
 
       _this.initiator = true;
+    };
+
+    _this.cnxn.onnegotiationneeded = function () {
+      sendDescription();
     };
 
     function logError(error) {
@@ -80,7 +84,7 @@ obtain([], ()=> {
     var configuration = {
       iceServers: [{
         urls: 'stun:stun2.l.google.com:19302',
-      }, ],
+      },],
     };
 
     this.cnxn = new RTCPeerConnection(configuration);
@@ -113,16 +117,23 @@ obtain([], ()=> {
         }, });
     };
 
+    var sendDescription = ()=> {
+      if (_this.cnxn.localDescription) {
+        console.log('sending local description:');
+        console.log(_this.cnxn.localDescription);
+        signal.send({ offer: {
+          origin: signal.id,
+          target: _this.remoteId,
+          sdp: _this.cnxn.localDescription,
+        }, });
+      }
+
+    };
+
     var localDesc = (desc)=> {
       _this.cnxn.setLocalDescription(desc)
         .then(()=> {
-          console.log('sending local description:');
-          console.log(_this.cnxn.localDescription);
-          signal.send({ offer: {
-            origin: signal.id,
-            target: _this.remoteId,
-            sdp: _this.cnxn.localDescription,
-          }, });
+          console.log('Set local description');
         })
         .catch(logError);
     };
