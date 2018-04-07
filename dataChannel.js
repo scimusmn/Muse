@@ -81,10 +81,6 @@ obtain([], ()=> {
       _this.initiator = true;
     };
 
-    _this.cnxn.onnegotiationneeded = function () {
-      sendDescription();
-    };
-
     function logError(error) {
       console.log(error.name + ': ' + error.message);
     }
@@ -117,23 +113,16 @@ obtain([], ()=> {
         }, });
     };
 
-    var sendDescription = ()=> {
-      if (_this.cnxn.localDescription) {
-        console.log('sending local description:');
-        console.log(_this.cnxn.localDescription);
-        signal.send({ offer: {
-          origin: signal.id,
-          target: _this.remoteId,
-          sdp: _this.cnxn.localDescription,
-        }, });
-      }
-
-    };
-
     var localDesc = (desc)=> {
       _this.cnxn.setLocalDescription(desc)
         .then(()=> {
-          console.log('Set local description');
+          console.log('sending local description:');
+          console.log(_this.cnxn.localDescription);
+          signal.send({ offer: {
+            origin: signal.id,
+            target: _this.remoteId,
+            sdp: _this.cnxn.localDescription,
+          }, });
         })
         .catch(logError);
     };
