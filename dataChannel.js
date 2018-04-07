@@ -5,6 +5,14 @@ obtain([], ()=> {
     console.log('creating new data channel');
     var _this = this;
 
+    var configuration = {
+      iceServers: [{
+        urls: 'stun:stun2.l.google.com:19302',
+      }, ],
+    };
+
+    this.cnxn = new RTCPeerConnection(configuration);
+
     var listeners = {};
 
     _this.onConnect = ()=> {};
@@ -80,14 +88,6 @@ obtain([], ()=> {
     function logError(error) {
       console.log(error.name + ': ' + error.message);
     }
-
-    var configuration = {
-      iceServers: [{
-        urls: 'stun:stun2.l.google.com:19302',
-      },],
-    };
-
-    this.cnxn = new RTCPeerConnection(configuration);
 
     _this.cnxn.ondatachannel = (event)=> {
       console.log('got data channel');
