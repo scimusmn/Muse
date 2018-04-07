@@ -103,8 +103,8 @@ obtain([], ()=> {
     };
 
     _this.cnxn.onicecandidate = (evt)=> {
-      console.log('found ice candidate:');
-      console.log(evt && evt.candidate);
+      //console.log('found ice candidate:');
+      //console.log(evt && evt.candidate);
       if (evt.candidate)
         signal.send({ connect: {
           origin: signal.id,
@@ -147,6 +147,8 @@ obtain([], ()=> {
     });
 
     signal.addListener('connect', (data)=> {
+      console.log('Received ICE candidate:');
+      console.log(data.candidate);
       _this.cnxn.addIceCandidate(new RTCIceCandidate(data.candidate));
     });
 
