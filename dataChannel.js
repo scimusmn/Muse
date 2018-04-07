@@ -8,7 +8,11 @@ obtain([], ()=> {
     var configuration = {
       iceServers: [{
         urls: 'stun:stun2.l.google.com:19302',
-      }, ],
+      }, {
+        url: 'turn:numb.viagenie.ca',
+        credential: 'muazkh',
+        username: 'webrtc@live.com',
+      },],
     };
 
     this.cnxn = new RTCPeerConnection(configuration);
