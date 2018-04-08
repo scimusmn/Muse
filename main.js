@@ -13,7 +13,7 @@ if (!window) {
   window.document = false;
 } else {
   if (typeof require == 'undefined') var require = false;
-  let script = document.currentScript;
+  var script = document.currentScript;
   muse.root = script.src.substr(0, script.src.lastIndexOf('/') + 1);
   if (muse.root.includes('C:/') || muse.root.includes('C:\\'))
     muse.root = muse.root.replace('file:///', '');
