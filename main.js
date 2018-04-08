@@ -209,7 +209,7 @@ window.obtain = function (addr, func) {
   if (addr.length <= 0) func(defaultImports);
   else addr.forEach(function (adr, ind, arr) {
     let next = null;
-    if (adr.includes('µ/')) adr = adr.replace('µ/', museDir);
+    if (adr.includes('µ/')) adr = adr.replace('µ/', muse.root);
     if (require) objs[ind] = require(adr);
     else get(adr).then((req)=> {
       if (req.responseURL.substr(0, location.origin.length) == location.origin) {
@@ -257,7 +257,7 @@ if (!muse.Node) {
   if (!window.customElements) {
     console.log('Webcomponents not natively supported.');
     var scrpt = document.createElement('script');
-    scrpt.src = museDir + 'webcomponents-lite.js';
+    scrpt.src = muse.root + 'webcomponents-lite.js';
     window.addEventListener('WebComponentsReady', function () {
       console.log('Webcomponents provided through polyfill.');
       obtain([app, 'µ/components/refDiv.js'], (imports)=> {
