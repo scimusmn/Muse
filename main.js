@@ -1,23 +1,29 @@
-if (!window) var window = global;
-
-if (typeof require == 'undefined') var require = false;
-var museDir = '';
-let script = document.currentScript;
-museDir = script.src.substr(0, script.src.lastIndexOf('/') + 1);
-if (museDir.includes('C:/') || museDir.includes('C:\\'))
-  museDir = museDir.replace('file:///', '');
-if (require) museDir = museDir.replace('file://', '');
-
-window.muse = {
+var muse = {
   debug: false,
-  root: museDir,
+  root: '',
   log: (data)=> {
     if (this.debug) console.log(data);
   },
 };
 
+if (!window) {
+  var window = global;
+  muse.Node = true;
+  muse.root = __dirname;
+  window.document = false;
+} else {
+  if (typeof require == 'undefined') var require = false;
+  let script = document.currentScript;
+  muse.root = script.src.substr(0, script.src.lastIndexOf('/') + 1);
+  if (muse.root.includes('C:/') || muse.root.includes('C:\\'))
+    muse.root = muse.root.replace('file:///', '');
+  if (require) muse.root = muse.root.replace('file://', '');
+}
+
+window.muse = muse;
+
 ////////////////// querySelector shortcut /////////////
-window.µ = function (id, elem) {
+if (document) window.µ = function (id, elem) {
   var ret;
   var root = ((elem) ? elem : document);
   var spl = id.split('>');
@@ -48,9 +54,9 @@ window.µ = function (id, elem) {
   else return ret.getAttribute(spl[1]);
 };
 
-window.µdir = museDir;
+window.µdir = muse.root;
 
-window.loadCSS = (filename)=> {
+if (document) window.loadCSS = (filename)=> {
   if (!µ(`[href="${filename}"]`)[0]) {
     var css = µ('+link', µ('head')[0]);
     css.type = 'text/css';
@@ -60,7 +66,7 @@ window.loadCSS = (filename)=> {
   }
 };
 
-window.importHTML = (address, cb)=> {
+if (document) window.importHTML = (address, cb)=> {
   var targ = µ(`[href="${address}"]`)[0];
   if (!targ) {
     let link = µ('+link');
@@ -108,7 +114,7 @@ window.inheritFrom = function (parent, addMethods) {
   return ret;
 };
 
-window.get = function (url, params) {
+if (document) window.get = function (url, params) {
   // Return a new promise.
   return new Promise(function (resolve, reject) {
     // Do the usual XHR stuff
@@ -140,7 +146,7 @@ window.get = function (url, params) {
   });
 };
 
-window.post = function (url, obj) {
+if (document) window.post = function (url, obj) {
   // Return a new promise.
   return new Promise(function (resolve, reject) {
     // Do the usual XHR stuff
@@ -177,7 +183,7 @@ window.provide = function (exports) {
 window.obtain = function (addr, func) {
   var _this = this;
   var objs = [];
-  var doc = document;
+  var doc = document || {};
   if (document.currentScript) {
     doc = document.currentScript.ownerDocument;
     var srcDir = document.currentScript.src;
@@ -243,37 +249,40 @@ window.obtain = function (addr, func) {
   if (require && addr.length) func.apply(null, objs);
 };
 
-var app = script.getAttribute('main');
+if (!muse.Node) {
+  var app = script.getAttribute('main');
 
-var started = false;
+  var started = false;
 
-if (!window.customElements) {
-  console.log('Webcomponents not natively supported.');
-  var scrpt = document.createElement('script');
-  scrpt.src = museDir + 'webcomponents-lite.js';
-  window.addEventListener('WebComponentsReady', function () {
-    console.log('Webcomponents provided through polyfill.');
+  if (!window.customElements) {
+    console.log('Webcomponents not natively supported.');
+    var scrpt = document.createElement('script');
+    scrpt.src = museDir + 'webcomponents-lite.js';
+    window.addEventListener('WebComponentsReady', function () {
+      console.log('Webcomponents provided through polyfill.');
+      obtain([app, 'µ/components/refDiv.js'], (imports)=> {
+        if (!started) {
+          started = true;
+          console.log(document.readyState);
+          if (document.readyState === 'complete' || document.readyState === 'loaded' || document.readyState === 'interactive') imports.app.start();
+          else document.addEventListener('DOMContentLoaded', function (event) {
+            imports.app.start();
+          });
+        }
+      });
+    });
+
+    document.head.insertBefore(scrpt, document.currentScript);
+  } else {
     obtain([app, 'µ/components/refDiv.js'], (imports)=> {
       if (!started) {
         started = true;
-        console.log(document.readyState);
         if (document.readyState === 'complete' || document.readyState === 'loaded' || document.readyState === 'interactive') imports.app.start();
         else document.addEventListener('DOMContentLoaded', function (event) {
           imports.app.start();
         });
+
       }
     });
-  });
-
-  document.head.insertBefore(scrpt, document.currentScript);
-} else {
-  obtain([app, 'µ/components/refDiv.js'], (imports)=> {
-    if (!started) {
-      started = true;
-      if (document.readyState === 'complete' || document.readyState === 'loaded' || document.readyState === 'interactive') imports.app.start();
-      else document.addEventListener('DOMContentLoaded', function (event) {
-        imports.app.start();
-      });
-    }
-  });
+  }
 }
