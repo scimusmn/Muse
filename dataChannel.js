@@ -2,7 +2,7 @@
 
 obtain([], ()=> {
   var dataChannel = function (signal) {
-    console.log('creating new data channel');
+    muse.log('creating new data channel');
     var _this = this;
 
     var configuration = {
@@ -12,7 +12,7 @@ obtain([], ()=> {
         url: 'turn:numb.viagenie.ca',
         credential: 'RTCBook!',
         username: 'ajhg.pub@gmail.com',
-      }, ],
+      },],
     };
 
     this.cnxn = new RTCPeerConnection(configuration);
@@ -28,7 +28,7 @@ obtain([], ()=> {
     };
 
     var getChannel = (channel)=> {
-      console.log('getting channel');
+      muse.log('getting channel');
 
       if (channel != signal) {
         _this.channel = channel;
@@ -86,20 +86,20 @@ obtain([], ()=> {
     };
 
     function logError(error) {
-      console.log(error.name + ': ' + error.message);
+      muse.log(error.name + ': ' + error.message);
     }
 
     _this.cnxn.ondatachannel = (event)=> {
-      console.log('got data channel');
+      muse.log('got data channel');
       getChannel(event.channel);
     };
 
     _this.cnxn.oniceconnectionstatechange = ()=> {
-      console.log(_this.cnxn.iceConnectionState);
+      muse.log(_this.cnxn.iceConnectionState);
       if (_this.cnxn.iceConnectionState == 'connected') {
         _this.connected = true;
       }else if (_this.cnxn.iceConnectionState == 'failed' && !_this.connected) {
-        console.log('failed to find candidates, reverting to backup');
+        muse.log('failed to find candidates, reverting to backup');
         _this.useSignal = true;
         _this.connected = true;
         getChannel(signal);
@@ -120,8 +120,8 @@ obtain([], ()=> {
     var localDesc = (desc)=> {
       _this.cnxn.setLocalDescription(desc)
         .then(()=> {
-          console.log('sending local description:');
-          console.log(_this.cnxn.localDescription);
+          muse.log('sending local description:');
+          muse.log(_this.cnxn.localDescription);
           signal.send({ offer: {
             origin: signal.id,
             target: _this.remoteId,
@@ -136,8 +136,8 @@ obtain([], ()=> {
     };*/
 
     signal.addListener('offer', (data)=> {
-      console.log('got remote description:');
-      console.log(data);
+      muse.log('got remote description:');
+      muse.log(data);
       if (!_this.remoteId) _this.remoteId = data.origin;
       _this.cnxn.setRemoteDescription(new RTCSessionDescription(data.sdp))
       .then(()=> {
@@ -151,8 +151,8 @@ obtain([], ()=> {
     });
 
     signal.addListener('connect', (data)=> {
-      console.log('Received ICE candidate:');
-      console.log(data.candidate);
+      muse.log('Received ICE candidate:');
+      muse.log(data.candidate);
       _this.cnxn.addIceCandidate(new RTCIceCandidate(data.candidate));
     });
 
