@@ -183,6 +183,7 @@ window.provide = function (exports) {
 window.obtain = function (addr, func) {
   var _this = this;
   var objs = [];
+  var loadDone = false;
   var doc = document || {};
   if (document.currentScript) {
     doc = document.currentScript.ownerDocument;
@@ -224,14 +225,15 @@ window.obtain = function (addr, func) {
 
             if (check) {
               objs.push(defaultImports);
-              func.apply(null, objs);
+              if (!loadDone) func.apply(null, objs);
+              loadDone = true;
             }
           }
         };
 
         var dirname = `var __dirname = ${adr.substr(0, adr.lastIndexOf('/'))}`;
         var intro = '//# sourceURL=' + adr + '\n()=>{var exports = {src: "' + adr + '", ready: ';
-        var re = /obtain\s*\(\s*\[/g;
+        var re = /obtain\s*\(\s*/g;
         if (req.responseText.match(re)) {
           intro += 'false, obtained: true}; ';
         } else intro += 'true}; ';
