@@ -62,7 +62,7 @@ obtain([], ()=> {
             }
           };
 
-          _this.send = function (obj) {
+          _this.send = function (obj, data) {
             if (data) obj = { [obj]: data };
             ws.send(JSON.stringify(obj));
           };
