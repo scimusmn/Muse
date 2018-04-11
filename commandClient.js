@@ -62,8 +62,9 @@ obtain([], ()=> {
             }
           };
 
-          _this.send = function (msgObj) {
-            ws.send(JSON.stringify(msgObj));
+          _this.send = function (obj) {
+            if (data) obj = { [obj]: data };
+            ws.send(JSON.stringify(obj));
           };
 
           _this.close = ()=> {
