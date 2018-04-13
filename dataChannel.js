@@ -12,7 +12,7 @@ obtain([], ()=> {
         url: 'turn:numb.viagenie.ca',
         credential: 'RTCBook!',
         username: 'ajhg.pub@gmail.com',
-      },],
+      }, ],
     };
 
     _this.peers = [];
@@ -128,7 +128,7 @@ obtain([], ()=> {
         onNewPeer(newPeer);
 
         newPeer.cnxn.createOffer().then((desc)=> {
-          localDesc(desc, newPeer);
+          return localDesc(desc, newPeer);
         }).catch(logError);
 
         return newPeer;
@@ -187,7 +187,7 @@ obtain([], ()=> {
         if (peer.cnxn.remoteDescription.type == 'offer') {
           console.log('creating answer');
           peer.cnxn.createAnswer().then((desc)=> {
-            localDesc(desc, peer);
+            return localDesc(desc, peer);
           }).catch(logError);
         }
       })
