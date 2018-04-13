@@ -12,7 +12,7 @@ obtain([], ()=> {
         url: 'turn:numb.viagenie.ca',
         credential: 'RTCBook!',
         username: 'ajhg.pub@gmail.com',
-      },],
+      }, ],
     };
 
     this.cnxn = new RTCPeerConnection(configuration);
@@ -49,7 +49,8 @@ obtain([], ()=> {
           }
         };
 
-        _this.send = (msg)=> {
+        _this.send = (msg, data)=> {
+          if (typeof msg == 'string') msg = { [msg]: data };
           _this.channel.send(JSON.stringify(msg));
         };
       } else {
