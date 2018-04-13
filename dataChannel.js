@@ -12,10 +12,12 @@ obtain([], ()=> {
         url: 'turn:numb.viagenie.ca',
         credential: 'RTCBook!',
         username: 'ajhg.pub@gmail.com',
-      },],
+      }, ],
     };
 
     _this.peers = [];
+
+    _this.find = (key, val)=>_this.peers.find(per=>per[key] == val);
 
     //{cnxn: , channel: , id: }
 
@@ -76,6 +78,8 @@ obtain([], ()=> {
 
         peer.onConnect();
       }
+
+      return peer;
     };
 
     var setupConnection = (peer)=> {
@@ -147,10 +151,6 @@ obtain([], ()=> {
           });
         })
         .catch(logError);
-    };
-
-    _this.onChannelInfo = (data)=> {
-
     };
 
     signal.addListener('cnxn:relay', (data)=> {
