@@ -10,6 +10,8 @@ class MuseElement extends HTMLElement {
 
     var capped = capFirst(stateName);
 
+    if (typeof _this[stateName] != 'undefined') var oldState = _this[stateName];
+
     var lost = `${capped}_state_lost`;
     var lose = (loseName) ? `on${capFirst(loseName)}` : `onLose${capped}`;
     var got = `${capped}_state_acquired`;
@@ -68,6 +70,8 @@ class MuseElement extends HTMLElement {
         }
       },
     });
+
+    if (typeof oldState != 'undefined')_this[stateName] = oldState;
   }
 
 }

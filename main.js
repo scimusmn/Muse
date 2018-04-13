@@ -231,9 +231,9 @@ window.obtain = function (addr, func) {
           }
         };
 
-        var dirname = `var __dirname = ${adr.substr(0, adr.lastIndexOf('/'))}`;
-        var intro = '//# sourceURL=' + adr + '\n()=>{var exports = {src: "' + adr + '", ready: ';
-        var re = /obtain\s*\(\s*/g;
+        var dirname = ` if(!__dirname) var __dirname = '${adr.substr(0, adr.lastIndexOf('/'))}';`;
+        var intro = dirname + '//# sourceURL=' + adr + '\n()=>{var exports = {src: "' + adr + '", ready: ';
+        var re = /obtain\s*\(*/g;
         if (req.responseText.match(re)) {
           intro += 'false, obtained: true}; ';
         } else intro += 'true}; ';

@@ -183,4 +183,6 @@ obtain([], ()=> {
   }
 
   exports.Dropdown = customElements.get('drop-down');
+
+  provide(exports);
 });

@@ -56,4 +56,6 @@ obtain([], ()=> {
   }
 
   exports.Button = customElements.get('but-ton');
+
+  provide(exports);
 });

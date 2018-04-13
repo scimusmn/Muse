@@ -50,4 +50,6 @@ obtain([], ()=> {
   }
 
   exports.Menu = customElements.get('muse-menu');
+
+  provide(exports);
 });

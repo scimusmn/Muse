@@ -7,6 +7,7 @@
   --menu-height: 2em;
   --transition-style: all 0s ease;
   --shadow-style: 0px 1px 4px rgba(0,0,0,.5);
+  --right-tray-size: 4em;
 
   position: relative;
   width: 100%;
@@ -23,7 +24,7 @@
 
 div {
   position: absolute;
-  display: inline-block;
+  display: block;
   top: 0;
   line-height: var(--menu-height);
   height: var(--menu-height);
@@ -41,6 +42,8 @@ div {
 }
 
 .titleDiv {
+  position: relative;
+  padding-right: var(--right-tray-size);
   left: 2em;
 }
 

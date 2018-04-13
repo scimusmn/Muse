@@ -51,4 +51,6 @@ obtain([`${__dirname}/museElement.js`], ({ MuseElement })=> {
   }
 
   exports.Card = customElements.get('muse-card');
+
+  provide(exports);
 });

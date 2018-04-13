@@ -62,4 +62,6 @@ obtain([`${__dirname}/museElement.js`], ({ MuseElement })=> {
   }
 
   exports.Growl = customElements.get('muse-growl');
+
+  provide(exports);
 });
