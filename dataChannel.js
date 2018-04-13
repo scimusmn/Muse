@@ -1,7 +1,7 @@
 'use strict';
 
 obtain([], ()=> {
-  var dataChannel = function (signal, addtData) {
+  var dataChannel = function (signal, hostInfo) {
     muse.log('creating new data channel');
     var _this = this;
 
@@ -126,7 +126,7 @@ obtain([], ()=> {
           signal.send({ offer: {
             origin: signal.id,
             target: _this.remoteId,
-            data: addtData,
+            hostInfo: hostInfo,
             sdp: _this.cnxn.localDescription,
           }, });
         })
@@ -137,9 +137,14 @@ obtain([], ()=> {
       _this.cnxn.createOffer(localDesc, logError);
     };*/
 
+    _this.onChannelInfo = (data)=> {
+
+    };
+
     signal.addListener('offer', (data)=> {
       muse.log('got remote description:');
       muse.log(data);
+      if (data.hostInfo) _this.onChannelInfo(data.hostInfo);
       if (!_this.remoteId) _this.remoteId = data.origin;
       _this.cnxn.setRemoteDescription(new RTCSessionDescription(data.sdp))
       .then(()=> {
