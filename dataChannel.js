@@ -12,7 +12,7 @@ obtain([], ()=> {
         url: 'turn:numb.viagenie.ca',
         credential: 'RTCBook!',
         username: 'ajhg.pub@gmail.com',
-      }, ],
+      },],
     };
 
     _this.peers = [];
@@ -167,7 +167,7 @@ obtain([], ()=> {
 
     signal.addListener('cnxn:description', (data)=> {
       var peer = _this.peers.find(per=>per.id == data.from);
-      muse.log('got remote session description:');
+      console.log('got remote session description:');
       muse.log(data);
       if (!peer) {
         var newCnxn = new RTCPeerConnection(configuration);
