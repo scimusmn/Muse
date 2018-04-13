@@ -84,16 +84,16 @@ obtain([], ()=> {
 
     var setupConnection = (peer)=> {
       var cnxn = peer.cnxn;
-      cnxn.ondatachannel = (event)=> {
+      peer.cnxn.ondatachannel = (event)=> {
         muse.log('got data channel');
         onNewChannel(peer);
       };
 
-      cnxn.oniceconnectionstatechange = ()=> {
+      peer.cnxn.oniceconnectionstatechange = ()=> {
         muse.log(cnxn.iceConnectionState);
-        if (cnxn.iceConnectionState == 'connected') {
+        if (peer.cnxn.iceConnectionState == 'connected') {
           peer.connected = true;
-        }else if (cnxn.iceConnectionState == 'failed' && !peer.connected) {
+        }else if (peer.cnxn.iceConnectionState == 'failed' && !peer.connected) {
           muse.log('failed to find candidates, reverting to backup');
           peer.useSignal = true;
           peer.connected = true;
@@ -101,13 +101,15 @@ obtain([], ()=> {
         }
       };
 
-      cnxn.onicecandidate = (evt)=> {
-        if (evt.candidate)
+      peer.cnxn.onicecandidate = (evt)=> {
+        if (evt.candidate) {
+          console.log('sending candidate');
           signal.send('cnxn:candidate', {
             from: signal.id,
             to: peer.id,
             candidate: evt.candidate,
           });
+        }
       };
 
     };
@@ -115,10 +117,9 @@ obtain([], ()=> {
     _this.connect = (remoteId)=> {
       var peer = _this.peers.find(per=>per.id == remoteId);
       if (!peer) {
-        var newCnxn = new RTCPeerConnection(configuration);
         var newPeer = {
-          cnxn: newCnxn,
-          channel: newCnxn.createDataChannel(remoteId),
+          cnxn: new RTCPeerConnection(configuration),
+          channel: this.cnxn.createDataChannel(remoteId),
           id: remoteId,
         };
 
@@ -172,8 +173,8 @@ obtain([], ()=> {
       if (!peer) {
         var newCnxn = new RTCPeerConnection(configuration);
         peer = {
-          cnxn: newCnxn,
-          channel: newCnxn.createDataChannel(data.from),
+          cnxn: new RTCPeerConnection(configuration),
+          channel: this.cnxn.createDataChannel(data.from),
           id: data.from,
         };
       }
@@ -195,6 +196,7 @@ obtain([], ()=> {
     });
 
     signal.addListener('cnxn:candidate', (data)=> {
+      console.log('got an ICE candidate');
       var peer = _this.peers.find(per=>per.id == data.from);
       if (peer) {
         muse.log('Received ICE candidate:');
