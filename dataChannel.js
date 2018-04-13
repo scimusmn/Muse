@@ -12,7 +12,7 @@ obtain([], ()=> {
         url: 'turn:numb.viagenie.ca',
         credential: 'RTCBook!',
         username: 'ajhg.pub@gmail.com',
-      },],
+      }, ],
     };
 
     _this.peers = [];
@@ -145,7 +145,7 @@ obtain([], ()=> {
           muse.log(peer.cnxn.localDescription);
           signal.send('cnxn:description', {
             from: signal.id,
-            to: peer.remoteId,
+            to: peer.id,
             hostInfo: hostInfo,
             sdp: peer.cnxn.localDescription,
           });
