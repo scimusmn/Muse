@@ -12,7 +12,7 @@ obtain([], ()=> {
         url: 'turn:numb.viagenie.ca',
         credential: 'RTCBook!',
         username: 'ajhg.pub@gmail.com',
-      }, ],
+      },],
     };
 
     _this.peers = [];
@@ -105,7 +105,7 @@ obtain([], ()=> {
         if (evt.candidate)
           signal.send('cnxn:candidate', {
             from: signal.id,
-            to: peer.remoteId,
+            to: peer.id,
             candidate: evt.candidate,
           });
       };
@@ -141,7 +141,7 @@ obtain([], ()=> {
     var localDesc = (desc, peer)=> {
       peer.cnxn.setLocalDescription(desc)
         .then(()=> {
-          muse.log('sending local description:');
+          console.log('sending local description:');
           muse.log(peer.cnxn.localDescription);
           signal.send('cnxn:description', {
             from: signal.id,
@@ -185,7 +185,9 @@ obtain([], ()=> {
         // if we received an offer, we need to answer
         if (peer.cnxn.remoteDescription.type == 'offer') {
           console.log('creating answer');
-          peer.cnxn.createAnswer().then(localDesc).catch(logError);
+          peer.cnxn.createAnswer().then((desc)=> {
+            localDesc(desc, peer);
+          }).catch(logError);
         }
       })
       .catch(logError);
