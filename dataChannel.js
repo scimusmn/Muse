@@ -1,7 +1,7 @@
 'use strict';
 
 obtain([], ()=> {
-  var dataChannel = function (signal) {
+  var dataChannel = function (signal, addtData) {
     muse.log('creating new data channel');
     var _this = this;
 
@@ -12,7 +12,7 @@ obtain([], ()=> {
         url: 'turn:numb.viagenie.ca',
         credential: 'RTCBook!',
         username: 'ajhg.pub@gmail.com',
-      }, ],
+      },],
     };
 
     this.cnxn = new RTCPeerConnection(configuration);
@@ -126,6 +126,7 @@ obtain([], ()=> {
           signal.send({ offer: {
             origin: signal.id,
             target: _this.remoteId,
+            data: addtData,
             sdp: _this.cnxn.localDescription,
           }, });
         })
