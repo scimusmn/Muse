@@ -1,23 +1,49 @@
 'use strict';
 
 obtain([], ()=> {
+
+  if (!window.muse.peers) {
+    window.muse.peers = [];
+  }
+
+  var configuration = {
+    iceServers: [{
+      urls: 'stun:stun2.l.google.com:19302',
+    }, {
+      url: 'turn:numb.viagenie.ca',
+      credential: 'RTCBook!',
+      username: 'ajhg.pub@gmail.com',
+    }, ],
+  };
+
+  var createPeer = (info)=> {
+    var nCnxn = new RTCPeerConnection(configuration);
+    var chan = (info.client) ? null : nCnxn.createDataChannel('testName');
+    var peer = {
+      cnxn: nCnxn,
+      channel: chan,
+      id: info.remoteId,
+    };
+    muse.peers.push(peer);
+
+    peer.onConnect = ()=> {};
+
+    peer.onClose = ()=> {};
+
+    peer.listeners = {};
+
+    peer.addListener = (evt, cb)=> {
+      peer.listeners[evt] = cb;
+    };
+
+    return peer;
+  };
+
   var dataChannel = function (signal, hostInfo) {
     muse.log('beginning channel monitor');
     var _this = this;
 
-    var configuration = {
-      iceServers: [{
-        urls: 'stun:stun2.l.google.com:19302',
-      }, {
-        url: 'turn:numb.viagenie.ca',
-        credential: 'RTCBook!',
-        username: 'ajhg.pub@gmail.com',
-      },],
-    };
-
-    _this.peers = [];
-
-    _this.find = (key, val)=>_this.peers.find(per=>per[key] == val);
+    _this.find = (key, val)=>muse.peers.find(per=>per[key] == val);
 
     //{cnxn: , channel: , id: }
 
@@ -30,16 +56,6 @@ obtain([], ()=> {
     };
 
     var onNewPeer = (peer)=> {
-      peer.onConnect = ()=> {};
-
-      peer.onClose = ()=> {};
-
-      peer.listeners = {};
-
-      peer.addListener = (evt, cb)=> {
-        peer.listeners[evt] = cb;
-      };
-
       if (!peer.useSignal) {
 
         peer.channel.onopen = ()=> {
@@ -114,18 +130,12 @@ obtain([], ()=> {
     };
 
     _this.connect = (remoteId)=> {
-      var peer = _this.peers.find(per=>per.id == remoteId);
+      var peer = muse.peers.find(per=>per.id == remoteId);
       if (!peer) {
-        var newPeer = {
-          cnxn: new RTCPeerConnection(configuration),
-          channel: this.cnxn.createDataChannel(remoteId),
-          id: remoteId,
-        };
-        _this.peers.push(newPeer);
-
+        var newPeer = createPeer({ remoteId: remoteId });
         onNewPeer(newPeer);
 
-        console.log(_this.peers);
+        console.log(muse.peers);
 
         newPeer.cnxn.createOffer().then((desc)=> {
           return localDesc(desc, newPeer);
@@ -156,7 +166,7 @@ obtain([], ()=> {
     };
 
     signal.addListener('cnxn:relay', (data)=> {
-      var peer = _this.peers.find(per=>per.id == data.from);
+      var peer = muse.peers.find(per=>per.id == data.from);
       if (peer) {
         for (var key in data) {
           if (data.hasOwnProperty(key)) {
@@ -168,17 +178,11 @@ obtain([], ()=> {
     });
 
     signal.addListener('cnxn:description', (data)=> {
-      var peer = _this.peers.find(per=>per.id == data.from);
+      var peer = muse.peers.find(per=>per.id == data.from);
       console.log('got remote session description:');
       console.log(data);
       if (!peer) {
-        console.log('making new connection');
-        var nCnxn = new RTCPeerConnection(configuration);
-        peer = {
-          cnxn: nCnxn,
-          channel: nCnxn.createDataChannel(data.from),
-          id: data.from,
-        };
+        peer = createPeer({ remoteId: data.from, client: true });
       }
 
       if (data.hostInfo) peer.info = data.hostInfo;
@@ -199,7 +203,7 @@ obtain([], ()=> {
 
     signal.addListener('cnxn:candidate', (data)=> {
       console.log('got an ICE candidate');
-      var peer = _this.peers.find(per=>per.id == data.from);
+      var peer = muse.peers.find(per=>per.id == data.from);
       if (peer) {
         console.log('Received ICE candidate:');
         muse.log(data.candidate);
