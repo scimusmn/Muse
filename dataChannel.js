@@ -12,7 +12,7 @@ obtain([], ()=> {
         url: 'turn:numb.viagenie.ca',
         credential: 'RTCBook!',
         username: 'ajhg.pub@gmail.com',
-      }, ],
+      },],
     };
 
     _this.peers = [];
@@ -21,7 +21,7 @@ obtain([], ()=> {
 
     //{cnxn: , channel: , id: }
 
-    this.cnxn = new RTCPeerConnection(configuration);
+    //this.cnxn = new RTCPeerConnection(configuration);
 
     var listeners = {};
 
@@ -142,6 +142,7 @@ obtain([], ()=> {
     var localDesc = (desc, peer)=> {
       peer.cnxn.setLocalDescription(desc)
         .then(()=> {
+          console.log(peer);
           console.log('sending local description:');
           muse.log(peer.cnxn.localDescription);
           signal.send('cnxn:description', {
@@ -169,12 +170,13 @@ obtain([], ()=> {
     signal.addListener('cnxn:description', (data)=> {
       var peer = _this.peers.find(per=>per.id == data.from);
       console.log('got remote session description:');
-      muse.log(data);
+      console.log(data);
       if (!peer) {
         console.log('making new connection');
+        var nCnxn = new RTCPeerConnection(configuration);
         peer = {
-          cnxn: new RTCPeerConnection(configuration),
-          channel: this.cnxn.createDataChannel(data.from),
+          cnxn: nCnxn,
+          channel: nCnxn.createDataChannel(data.from),
           id: data.from,
         };
       }
