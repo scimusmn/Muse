@@ -50,7 +50,7 @@ obtain([], ()=> {
 
         peer.channel.onclose = ()=> {
           peer.onClose();
-          _this.peers = _this.peers.filter(per=>per.id != peer.id);
+          //_this.peers = _this.peers.filter(per=>per.id != peer.id);
         };
 
         peer.channel.onmessage = function (evt) {
@@ -83,21 +83,20 @@ obtain([], ()=> {
     };
 
     var setupConnection = (peer)=> {
-      var cnxn = peer.cnxn;
       peer.cnxn.ondatachannel = (event)=> {
         muse.log('got data channel');
-        onNewChannel(peer);
+        onNewPeer(peer);
       };
 
       peer.cnxn.oniceconnectionstatechange = ()=> {
-        muse.log(cnxn.iceConnectionState);
+        console.log(cnxn.iceConnectionState);
         if (peer.cnxn.iceConnectionState == 'connected') {
           peer.connected = true;
         }else if (peer.cnxn.iceConnectionState == 'failed' && !peer.connected) {
           muse.log('failed to find candidates, reverting to backup');
           peer.useSignal = true;
           peer.connected = true;
-          onNewChannel(peer);
+          onNewPeer(peer);
         }
       };
 
@@ -122,10 +121,11 @@ obtain([], ()=> {
           channel: this.cnxn.createDataChannel(remoteId),
           id: remoteId,
         };
-
         _this.peers.push(newPeer);
 
         onNewPeer(newPeer);
+
+        console.log(_this.peers);
 
         newPeer.cnxn.createOffer().then((desc)=> {
           return localDesc(desc, newPeer);
@@ -171,7 +171,7 @@ obtain([], ()=> {
       console.log('got remote session description:');
       muse.log(data);
       if (!peer) {
-        var newCnxn = new RTCPeerConnection(configuration);
+        console.log('making new connection');
         peer = {
           cnxn: new RTCPeerConnection(configuration),
           channel: this.cnxn.createDataChannel(data.from),
@@ -199,7 +199,7 @@ obtain([], ()=> {
       console.log('got an ICE candidate');
       var peer = _this.peers.find(per=>per.id == data.from);
       if (peer) {
-        muse.log('Received ICE candidate:');
+        console.log('Received ICE candidate:');
         muse.log(data.candidate);
         peer.cnxn.addIceCandidate(new RTCIceCandidate(data.candidate));
       }
