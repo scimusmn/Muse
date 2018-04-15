@@ -13,7 +13,7 @@ obtain([], ()=> {
       url: 'turn:numb.viagenie.ca',
       credential: 'RTCBook!',
       username: 'ajhg.pub@gmail.com',
-    },],
+    }, ],
   };
 
   var createPeer = (info)=> {
@@ -89,7 +89,7 @@ obtain([], ()=> {
         peer.send = (data)=> {
           signal.send('cnxn:relay', {
             to: peer.id,
-            from: signal.id,
+            //from: signal.id,
             data: data,
           });
         };
@@ -119,7 +119,7 @@ obtain([], ()=> {
       peer.cnxn.onicecandidate = (evt)=> {
         if (evt.candidate) {
           signal.send('cnxn:candidate', {
-            from: signal.id,
+            //from: signal.id,
             to: peer.id,
             candidate: evt.candidate,
           });
@@ -152,7 +152,7 @@ obtain([], ()=> {
       peer.cnxn.setLocalDescription(desc)
         .then(()=> {
           signal.send('cnxn:description', {
-            from: signal.id,
+            //from: signal.id,
             to: peer.id,
             hostInfo: hostInfo,
             sdp: peer.cnxn.localDescription,
