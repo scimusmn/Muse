@@ -18,7 +18,7 @@ obtain([], ()=> {
 
   var createPeer = (info)=> {
     var nCnxn = new RTCPeerConnection(configuration);
-    var chan = (info.client) ? null : nCnxn.createDataChannel(info.remoteId);
+    var chan = (info.isClient) ? null : nCnxn.createDataChannel(info.remoteId);
     var peer = {
       cnxn: nCnxn,
       channel: chan,
@@ -59,8 +59,10 @@ obtain([], ()=> {
       if (!peer.useSignal) {
 
         peer.channel.onopen = ()=> {
+          console.log('opening channel');
           peer.onConnect();
 
+          console.log('calling onPeerConnect');
           _this.onPeerConnect(peer);
         };
 
@@ -94,8 +96,6 @@ obtain([], ()=> {
 
         peer.onConnect();
       }
-
-      return peer;
     };
 
     var setupConnection = (peer)=> {
@@ -105,6 +105,7 @@ obtain([], ()=> {
       };
 
       peer.cnxn.oniceconnectionstatechange = ()=> {
+        console.log(peer.cnxn.iceConnectionState);
         if (peer.cnxn.iceConnectionState == 'connected') {
           peer.connected = true;
         }else if (peer.cnxn.iceConnectionState == 'failed' && !peer.connected) {
@@ -176,7 +177,7 @@ obtain([], ()=> {
       var peer = muse.peers.find(per=>per.id == data.from);
       console.log('got remote session description:');
       if (!peer) {
-        peer = createPeer({ remoteId: data.from, client: true });
+        peer = createPeer({ remoteId: data.from, isClient: true });
         setupConnection(peer);
       }
 
