@@ -18,7 +18,7 @@ obtain([], ()=> {
 
   var createPeer = (info)=> {
     var nCnxn = new RTCPeerConnection(configuration);
-    var chan = (info.client) ? null : nCnxn.createDataChannel('testName');
+    var chan = (info.client) ? null : nCnxn.createDataChannel(info.remoteId);
     var peer = {
       cnxn: nCnxn,
       channel: chan,
@@ -55,7 +55,7 @@ obtain([], ()=> {
 
     };
 
-    var onNewPeer = (peer)=> {
+    var onPeerConnection = (peer)=> {
       if (!peer.useSignal) {
 
         peer.channel.onopen = ()=> {
@@ -101,24 +101,22 @@ obtain([], ()=> {
     var setupConnection = (peer)=> {
       peer.cnxn.ondatachannel = (event)=> {
         muse.log('got data channel');
-        onNewPeer(peer);
+        onPeerConnection(peer);
       };
 
       peer.cnxn.oniceconnectionstatechange = ()=> {
-        console.log(cnxn.iceConnectionState);
         if (peer.cnxn.iceConnectionState == 'connected') {
           peer.connected = true;
         }else if (peer.cnxn.iceConnectionState == 'failed' && !peer.connected) {
           muse.log('failed to find candidates, reverting to backup');
           peer.useSignal = true;
           peer.connected = true;
-          onNewPeer(peer);
+          onPeerConnection(peer);
         }
       };
 
       peer.cnxn.onicecandidate = (evt)=> {
         if (evt.candidate) {
-          console.log('sending candidate');
           signal.send('cnxn:candidate', {
             from: signal.id,
             to: peer.id,
@@ -133,9 +131,7 @@ obtain([], ()=> {
       var peer = muse.peers.find(per=>per.id == remoteId);
       if (!peer) {
         var newPeer = createPeer({ remoteId: remoteId });
-        onNewPeer(newPeer);
-
-        console.log(muse.peers);
+        setupConnection(newPeer);
 
         newPeer.cnxn.createOffer().then((desc)=> {
           return localDesc(desc, newPeer);
@@ -152,9 +148,6 @@ obtain([], ()=> {
     var localDesc = (desc, peer)=> {
       peer.cnxn.setLocalDescription(desc)
         .then(()=> {
-          console.log(peer);
-          console.log('sending local description:');
-          muse.log(peer.cnxn.localDescription);
           signal.send('cnxn:description', {
             from: signal.id,
             to: peer.id,
@@ -180,9 +173,9 @@ obtain([], ()=> {
     signal.addListener('cnxn:description', (data)=> {
       var peer = muse.peers.find(per=>per.id == data.from);
       console.log('got remote session description:');
-      console.log(data);
       if (!peer) {
         peer = createPeer({ remoteId: data.from, client: true });
+        setupConnection(peer);
       }
 
       if (data.hostInfo) peer.info = data.hostInfo;
@@ -202,10 +195,8 @@ obtain([], ()=> {
     });
 
     signal.addListener('cnxn:candidate', (data)=> {
-      console.log('got an ICE candidate');
       var peer = muse.peers.find(per=>per.id == data.from);
       if (peer) {
-        console.log('Received ICE candidate:');
         muse.log(data.candidate);
         peer.cnxn.addIceCandidate(new RTCIceCandidate(data.candidate));
       }
