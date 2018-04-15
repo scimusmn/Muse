@@ -13,7 +13,7 @@ obtain([], ()=> {
       url: 'turn:numb.viagenie.ca',
       credential: 'RTCBook!',
       username: 'ajhg.pub@gmail.com',
-    }, ],
+    },],
   };
 
   var createPeer = (info)=> {
@@ -55,7 +55,7 @@ obtain([], ()=> {
 
     };
 
-    var onPeerConnection = (peer)=> {
+    var configureChannel = (peer)=> {
       if (!peer.useSignal) {
 
         peer.channel.onopen = ()=> {
@@ -100,8 +100,8 @@ obtain([], ()=> {
 
     var setupConnection = (peer)=> {
       peer.cnxn.ondatachannel = (event)=> {
-        muse.log('got data channel');
-        onPeerConnection(peer);
+        peer.channel = event.channel;
+        configureChannel(peer);
       };
 
       peer.cnxn.oniceconnectionstatechange = ()=> {
@@ -111,7 +111,7 @@ obtain([], ()=> {
           muse.log('failed to find candidates, reverting to backup');
           peer.useSignal = true;
           peer.connected = true;
-          onPeerConnection(peer);
+          configureChannel(peer);
         }
       };
 
@@ -132,6 +132,8 @@ obtain([], ()=> {
       if (!peer) {
         var newPeer = createPeer({ remoteId: remoteId });
         setupConnection(newPeer);
+
+        configureChannel(newPeer);
 
         newPeer.cnxn.createOffer().then((desc)=> {
           return localDesc(desc, newPeer);
@@ -179,7 +181,6 @@ obtain([], ()=> {
       }
 
       if (data.hostInfo) peer.info = data.hostInfo;
-      //if (!peer.id) peer.id = data.from;
       peer.cnxn.setRemoteDescription(new RTCSessionDescription(data.sdp))
       .then(()=> {
         // if we received an offer, we need to answer
