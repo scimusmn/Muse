@@ -75,6 +75,7 @@ obtain(['µ/events.js'], ({ Emitter })=> {
 
           _this.send = function (obj, data) {
             if (data) obj = { [obj]: data };
+            console.log(JSON.stringify(obj));
             _this.ws.send(JSON.stringify(obj));
           };
 
