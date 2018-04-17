@@ -53,7 +53,7 @@ obtain(['µ/socket.js', 'µ/events.js'], (socket, { Emitter })=> {
       url: 'turn:numb.viagenie.ca',
       credential: 'RTCBook!',
       username: 'ajhg.pub@gmail.com',
-    }, ],
+    },],
   };
 
   class Peer extends Emitter {
@@ -129,6 +129,7 @@ obtain(['µ/socket.js', 'µ/events.js'], (socket, { Emitter })=> {
       };
 
       _this.cnxn.onicecandidate = (evt)=> {
+        console.log('sending ice candidate');
         if (evt.candidate) {
           signal.send('cnxn:candidate', {
             to: _this.id,
@@ -138,7 +139,7 @@ obtain(['µ/socket.js', 'µ/events.js'], (socket, { Emitter })=> {
       };
 
       signal.on('cnxn:candidate', (data)=> {
-        console.log(data);
+        console.log('receiving ice candidate');
         if (data.from == _this.id) {
           _this.cnxn.addIceCandidate(new RTCIceCandidate(data.candidate));
         }
