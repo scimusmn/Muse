@@ -2,12 +2,16 @@
 
 obtain(['µ/socket.js', 'µ/events.js'], (socket, { Emitter })=> {
 
-  var signal = socket.connect(appData.config.cnxnURL);
+  var signal = null;
 
   if (!window.muse.peers) {
     window.muse.peers = [];
 
     window.muse.peerManager = new Emitter();
+  }
+
+  exports.init = (sig)=> {
+    signal = sig;
 
     signal.addListener('cnxn:description', (data)=> {
       var peer = muse.peers.find(per=>per.id == data.from);
@@ -19,7 +23,7 @@ obtain(['µ/socket.js', 'µ/events.js'], (socket, { Emitter })=> {
 
       peer.handleRemoteDescription(data);
     });
-  }
+  };
 
   exports.onPeerAdded = (cb)=> {
     muse.peerManager.on('internal:new', cb);
@@ -49,7 +53,7 @@ obtain(['µ/socket.js', 'µ/events.js'], (socket, { Emitter })=> {
       url: 'turn:numb.viagenie.ca',
       credential: 'RTCBook!',
       username: 'ajhg.pub@gmail.com',
-    }, ],
+    },],
   };
 
   class Peer extends Emitter {
