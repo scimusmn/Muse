@@ -1,10 +1,49 @@
 'use strict';
 
-obtain([], ()=> {
+obtain(['µ/socket.js'], (socket)=> {
+
+  var signal = socket.connect(window.location.hostname);
 
   if (!window.muse.peers) {
     window.muse.peers = [];
+
+    window.muse.peerManager = new EventTarget();
+
+    signal.addListener('cnxn:description', (data)=> {
+      var peer = muse.peers.find(per=>per.id == data.from);
+      if (!peer) {
+        peer = new Peer({ remoteId: data.from, isClient: true });
+        muse.peers.push(peer);
+        muse.peerManager.dispatchEvent(new CustomEvent('internal:new', { detail: peer }));
+      }
+
+      peer.handleRemoteDescription(data);
+    });
   }
+
+  exports.onPeerAdded = (cb)=> {
+    muse.peerManager.addEventListener('internal:new', (e)=> {
+      cb(e.details);
+    });
+  };
+
+  exports.onPeerDisconnect = (cb)=> {
+    muse.peerManager.addEventListener('internal:new', (e)=> {
+      var which = e.details;
+      cb(which);
+      muse.peers = muse.peers.filter(peer=>peer.id != which.id);
+    });
+  };
+
+  exports.getPeer = (data)=> {
+    var peer = muse.peers.find(per=>per.id == data.remoteId);
+    if (!peer) {
+      peer = new Peer({ remoteId: data.remoteId, isClient: data.passive });
+      muse.peers.push(peer);
+    }
+
+    return peer;
+  };
 
   var configuration = {
     iceServers: [{
@@ -13,122 +52,23 @@ obtain([], ()=> {
       url: 'turn:numb.viagenie.ca',
       credential: 'RTCBook!',
       username: 'ajhg.pub@gmail.com',
-    }, ],
+    },],
   };
 
-  var createPeer = (info)=> {
-    var nCnxn = new RTCPeerConnection(configuration);
-    var chan = (info.isClient) ? null : nCnxn.createDataChannel(info.remoteId);
-    var peer = {
-      cnxn: nCnxn,
-      channel: chan,
-      id: info.remoteId,
-    };
-    muse.peers.push(peer);
+  class Peer extends EventTarget {
+    constructor(info) {
+      super();
 
-    peer.onConnect = ()=> {};
+      var _this = this;
+      _this.cnxn = new RTCPeerConnection(configuration);
+      if (!info.isClient) _this.channel = _this.cnxn.createDataChannel(info.remoteId);
+      _this.id = info.remoteId;
 
-    peer.onClose = ()=> {};
+      _this.setupConnection();
+      if (_this.channel) _this.configureChannel();
+    }
 
-    peer.listeners = {};
-
-    peer.addListener = (evt, cb)=> {
-      peer.listeners[evt] = cb;
-    };
-
-    return peer;
-  };
-
-  var dataChannel = function (signal, hostInfo) {
-    muse.log('beginning channel monitor');
-    var _this = this;
-
-    _this.find = (key, val)=>muse.peers.find(per=>per[key] == val);
-
-    //{cnxn: , channel: , id: }
-
-    //this.cnxn = new RTCPeerConnection(configuration);
-
-    var listeners = {};
-
-    _this.onPeerConnect = (peer)=> {
-
-    };
-
-    var configureChannel = (peer)=> {
-      if (!peer.useSignal) {
-
-        peer.channel.onopen = ()=> {
-          console.log('opening channel');
-          peer.onConnect();
-
-          console.log('calling onPeerConnect');
-          _this.onPeerConnect(peer);
-        };
-
-        peer.channel.onclose = ()=> {
-          peer.onClose();
-          //_this.peers = _this.peers.filter(per=>per.id != peer.id);
-        };
-
-        peer.channel.onmessage = function (evt) {
-          var data = JSON.parse(evt.data);
-          for (var key in data) {
-            if (data.hasOwnProperty(key)) {
-              if (key in peer.listeners) peer.listeners[key](data[key], data);
-            }
-          }
-        };
-
-        peer.send = (msg, data)=> {
-          if (typeof msg == 'string') msg = { [msg]: data };
-          peer.channel.send(JSON.stringify(msg));
-        };
-      } else {
-
-        peer.send = (data)=> {
-          signal.send('cnxn:relay', {
-            to: peer.id,
-            //from: signal.id,
-            data: data,
-          });
-        };
-
-        peer.onConnect();
-      }
-    };
-
-    var setupConnection = (peer)=> {
-      peer.cnxn.ondatachannel = (event)=> {
-        peer.channel = event.channel;
-        configureChannel(peer);
-      };
-
-      peer.cnxn.oniceconnectionstatechange = ()=> {
-        console.log(peer.cnxn.iceConnectionState);
-        if (peer.cnxn.iceConnectionState == 'connected') {
-          peer.connected = true;
-        }else if (peer.cnxn.iceConnectionState == 'failed' && !peer.connected) {
-          muse.log('failed to find candidates, reverting to backup');
-          peer.useSignal = true;
-          peer.connected = true;
-          configureChannel(peer);
-        }
-      };
-
-      peer.cnxn.onicecandidate = (evt)=> {
-        if (evt.candidate) {
-          signal.send('cnxn:candidate', {
-            //from: signal.id,
-            to: peer.id,
-            candidate: evt.candidate,
-          });
-        }
-      };
-
-    };
-
-    _this.connect = (remoteId)=> {
+    connect() {
       var peer = muse.peers.find(per=>per.id == remoteId);
       if (!peer) {
         var newPeer = createPeer({ remoteId: remoteId });
@@ -136,78 +76,365 @@ obtain([], ()=> {
 
         configureChannel(newPeer);
 
-        newPeer.cnxn.createOffer().then((desc)=> {
-          return localDesc(desc, newPeer);
-        }).catch(logError);
+        _this.cnxn.createOffer().then(_this.handleLocalDescription.bind(_this))
+        .catch(_this.logError.bind(_this));
 
         return newPeer;
       } else return peer;
     };
 
-    function logError(error) {
-      muse.log(error.name + ': ' + error.message);
+    logError(error) {
+      this.dispatchEvent(new CustomEvent('internal:error', { detail: error }));
     }
 
-    var localDesc = (desc, peer)=> {
-      peer.cnxn.setLocalDescription(desc)
+    handleLocalDescription (desc) {
+      var _this = this;
+      _this.cnxn.setLocalDescription(desc)
         .then(()=> {
           signal.send('cnxn:description', {
             //from: signal.id,
-            to: peer.id,
+            to: _this.id,
             hostInfo: hostInfo,
-            sdp: peer.cnxn.localDescription,
+            sdp: _this.cnxn.localDescription,
           });
         })
-        .catch(logError);
+        .catch(_this.logError.bind(_this));
     };
 
-    signal.addListener('cnxn:relay', (data)=> {
-      var peer = muse.peers.find(per=>per.id == data.from);
-      if (peer) {
-        for (var key in data) {
-          if (data.hasOwnProperty(key)) {
-            if (key in peer.listeners) peer.listeners[key](data[key], data);
+    handleRemoteDescription(data) {
+      var _this = this;
+      if (data.from == _this.id) {
+        if (data.hostInfo) peer.info = data.hostInfo;
+        _this.cnxn.setRemoteDescription(new RTCSessionDescription(data.sdp))
+        .then(()=> {
+          // if we received an offer, we need to answer
+          if (_this.cnxn.remoteDescription.type == 'offer') {
+            console.log('creating answer');
+            _this.cnxn.createAnswer().then(_this.handleLocalDescription.bind(_this))
+            .catch(_this.logError.bind(_this));
           }
+        })
+        .catch(_this.logError.bind(_this));
+      }
+    };
+
+    setupConnection() {
+      var _this = this;
+      _this.cnxn.ondatachannel = (event)=> {
+        _this.channel = event.channel;
+        _this.configureChannel();
+      };
+
+      _this.cnxn.oniceconnectionstatechange = ()=> {
+        console.log(_this.cnxn.iceConnectionState);
+        if (_this.cnxn.iceConnectionState == 'connected') {
+          //connected
+        }else if (_this.cnxn.iceConnectionState == 'failed' && !_this.connected) {
+          muse.log('failed to find candidates, reverting to backup');
+          _this.useSignal = true;
+          _this.connected = true;
+          _this.configureChannel();
         }
-      }
+      };
 
-    });
-
-    signal.addListener('cnxn:description', (data)=> {
-      var peer = muse.peers.find(per=>per.id == data.from);
-      console.log('got remote session description:');
-      if (!peer) {
-        peer = createPeer({ remoteId: data.from, isClient: true });
-        setupConnection(peer);
-      }
-
-      if (data.hostInfo) peer.info = data.hostInfo;
-      peer.cnxn.setRemoteDescription(new RTCSessionDescription(data.sdp))
-      .then(()=> {
-        // if we received an offer, we need to answer
-        if (peer.cnxn.remoteDescription.type == 'offer') {
-          console.log('creating answer');
-          peer.cnxn.createAnswer().then((desc)=> {
-            return localDesc(desc, peer);
-          }).catch(logError);
+      _this.cnxn.onicecandidate = (evt)=> {
+        if (evt.candidate) {
+          signal.send('cnxn:candidate', {
+            //from: signal.id,
+            to: _this.id,
+            candidate: evt.candidate,
+          });
         }
-      })
-      .catch(logError);
+      };
 
-    });
+      signal.addListener('cnxn:candidate', (data)=> {
+        if (data.from == _this.id) {
+          _this.cnxn.addIceCandidate(new RTCIceCandidate(data.candidate));
+        }
+      });
+    }
 
-    signal.addListener('cnxn:candidate', (data)=> {
-      var peer = muse.peers.find(per=>per.id == data.from);
-      if (peer) {
-        muse.log(data.candidate);
-        peer.cnxn.addIceCandidate(new RTCIceCandidate(data.candidate));
+    configureChannel() {
+      var _this = this;
+      if (!_this.useSignal) {
+        _this.channel.onopen = ()=> {
+          _this.connected = true;
+          _this.dispatchEvent(new CustomEvent('internal:connect', { detail: _this }));
+        };
+
+        _this.channel.onclose = ()=> {
+          _this.dispatchEvent(new CustomEvent('internal:close', { detail: false }));
+        };
+
+        _this.channel.onmessage = function (evt) {
+          var data = JSON.parse(evt.data);
+          for (var key in data) {
+            if (data.hasOwnProperty(key)) {
+              _this.dispatchEvent(new CustomEvent(key, { detail: data[key] }));
+            }
+          }
+        };
+
+        _this.send = (msg, data)=> {
+          if (typeof msg == 'string') msg = { [msg]: data };
+          _this.channel.send(JSON.stringify(msg));
+        };
+      } else {
+
+        _this.send = (data)=> {
+          signal.send('cnxn:relay', {
+            to: _this.id,
+            data: data,
+          });
+        };
+
+        signal.on('cnxn:relay', (data)=> {
+          if (data.from == _this.id) {
+            for (var key in data) {
+              if (data.hasOwnProperty(key)) {
+                _this.dispatchEvent(new CustomEvent(key, { detail: data[key] }));
+              }
+            }
+          }
+        });
+
+        _this.connected = true;
+        _this.dispatchEvent(new CustomEvent('internal:connect', { detail: _this }));
       }
+    }
 
-    });
+    on(evt, cb) {
+      this.addEventListener(evt, (e)=> {
+        cb(e.detail);
+      });
+    }
 
-  };
+    addListener(evt, cb) {
+      this.on(evt, cb);
+    }
 
-  exports.DataChannel = dataChannel;
+    set onconnect(cb) {
+      if (this.connected) cb();
+      else this.addEventListener('internal:connect', (e)=> {
+        cb();
+      });
+    }
+
+    set onclose(cb) {
+      this.addEventListener('internal:close', (e)=> {
+        cb();
+      });
+    }
+
+    set onconnectionerror(cb) {
+      this.addEventListener('internal:error', (e)=> {
+        cb(e.detail);
+      });
+    }
+  }
+
+  // var createPeer = (info)=> {
+  //   var nCnxn = new RTCPeerConnection(configuration);
+  //   var chan = (info.isClient) ? null : nCnxn.createDataChannel(info.remoteId);
+  //   var peer = {
+  //     cnxn: nCnxn,
+  //     channel: chan,
+  //     id: info.remoteId,
+  //   };
+  //   muse.peers.push(peer);
+  //
+  //   peer.onConnect = ()=> {};
+  //
+  //   peer.onClose = ()=> {};
+  //
+  //   peer.listeners = {};
+  //
+  //   peer.addListener = (evt, cb)=> {
+  //     peer.listeners[evt] = cb;
+  //   };
+  //
+  //   return peer;
+  // };
+  //
+  // var dataChannel = function (signal, hostInfo) {
+  //   muse.log('beginning channel monitor');
+  //   var _this = this;
+  //
+  //   _this.find = (key, val)=>muse.peers.find(per=>per[key] == val);
+  //
+  //   //{cnxn: , channel: , id: }
+  //
+  //   //this.cnxn = new RTCPeerConnection(configuration);
+  //
+  //   _this.onPeerConnect = (peer)=> {
+  //
+  //   };
+  //
+  //   _this.prepareConnection = (remoteId)=> {
+  //     var peer = muse.peers.find(per=>per.id == remoteId);
+  //     if (!peer) {
+  //       peer = createPeer({ remoteId: remoteId, isClient: true });
+  //       setupConnection(peer);
+  //     }
+  //
+  //     return peer;
+  //   };
+  //
+  //   var configureChannel = (peer)=> {
+  //     if (!peer.useSignal) {
+  //
+  //       peer.channel.onopen = ()=> {
+  //         console.log('opening channel');
+  //         peer.onConnect();
+  //
+  //         console.log('calling onPeerConnect');
+  //         _this.onPeerConnect(peer);
+  //       };
+  //
+  //       peer.channel.onclose = ()=> {
+  //         peer.onClose();
+  //         //_this.peers = _this.peers.filter(per=>per.id != peer.id);
+  //       };
+  //
+  //       peer.channel.onmessage = function (evt) {
+  //         var data = JSON.parse(evt.data);
+  //         for (var key in data) {
+  //           if (data.hasOwnProperty(key)) {
+  //             if (key in peer.listeners) peer.listeners[key](data[key], data);
+  //           }
+  //         }
+  //       };
+  //
+  //       peer.send = (msg, data)=> {
+  //         if (typeof msg == 'string') msg = { [msg]: data };
+  //         peer.channel.send(JSON.stringify(msg));
+  //       };
+  //     } else {
+  //
+  //       peer.send = (data)=> {
+  //         signal.send('cnxn:relay', {
+  //           to: peer.id,
+  //           //from: signal.id,
+  //           data: data,
+  //         });
+  //       };
+  //
+  //       peer.onConnect();
+  //     }
+  //   };
+  //
+  //   var setupConnection = (peer)=> {
+  //     peer.cnxn.ondatachannel = (event)=> {
+  //       peer.channel = event.channel;
+  //       configureChannel(peer);
+  //     };
+  //
+  //     peer.cnxn.oniceconnectionstatechange = ()=> {
+  //       console.log(peer.cnxn.iceConnectionState);
+  //       if (peer.cnxn.iceConnectionState == 'connected') {
+  //         peer.connected = true;
+  //       }else if (peer.cnxn.iceConnectionState == 'failed' && !peer.connected) {
+  //         muse.log('failed to find candidates, reverting to backup');
+  //         peer.useSignal = true;
+  //         peer.connected = true;
+  //         configureChannel(peer);
+  //       }
+  //     };
+  //
+  //     peer.cnxn.onicecandidate = (evt)=> {
+  //       if (evt.candidate) {
+  //         signal.send('cnxn:candidate', {
+  //           //from: signal.id,
+  //           to: peer.id,
+  //           candidate: evt.candidate,
+  //         });
+  //       }
+  //     };
+  //
+  //   };
+  //
+  //   _this.connect = (remoteId)=> {
+  //     var peer = muse.peers.find(per=>per.id == remoteId);
+  //     if (!peer) {
+  //       var newPeer = createPeer({ remoteId: remoteId });
+  //       setupConnection(newPeer);
+  //
+  //       configureChannel(newPeer);
+  //
+  //       newPeer.cnxn.createOffer().then((desc)=> {
+  //         return localDesc(desc, newPeer);
+  //       }).catch(logError);
+  //
+  //       return newPeer;
+  //     } else return peer;
+  //   };
+  //
+  //   function logError(error) {
+  //     muse.log(error.name + ': ' + error.message);
+  //   }
+  //
+  //   var localDesc = (desc, peer)=> {
+  //     peer.cnxn.setLocalDescription(desc)
+  //       .then(()=> {
+  //         signal.send('cnxn:description', {
+  //           //from: signal.id,
+  //           to: peer.id,
+  //           hostInfo: hostInfo,
+  //           sdp: peer.cnxn.localDescription,
+  //         });
+  //       })
+  //       .catch(logError);
+  //   };
+  //
+  //   signal.addListener('cnxn:relay', (data)=> {
+  //     var peer = muse.peers.find(per=>per.id == data.from);
+  //     if (peer) {
+  //       for (var key in data) {
+  //         if (data.hasOwnProperty(key)) {
+  //           if (key in peer.listeners) peer.listeners[key](data[key], data);
+  //         }
+  //       }
+  //     }
+  //
+  //   });
+  //
+  //   signal.addListener('cnxn:description', (data)=> {
+  //     var peer = muse.peers.find(per=>per.id == data.from);
+  //     console.log('got remote session description:');
+  //     if (!peer) {
+  //       peer = createPeer({ remoteId: data.from, isClient: true });
+  //       setupConnection(peer);
+  //     }
+  //
+  //     if (data.hostInfo) peer.info = data.hostInfo;
+  //     peer.cnxn.setRemoteDescription(new RTCSessionDescription(data.sdp))
+  //     .then(()=> {
+  //       // if we received an offer, we need to answer
+  //       if (peer.cnxn.remoteDescription.type == 'offer') {
+  //         console.log('creating answer');
+  //         peer.cnxn.createAnswer().then((desc)=> {
+  //           return localDesc(desc, peer);
+  //         }).catch(logError);
+  //       }
+  //     })
+  //     .catch(logError);
+  //
+  //   });
+  //
+  //   signal.addListener('cnxn:candidate', (data)=> {
+  //     var peer = muse.peers.find(per=>per.id == data.from);
+  //     if (peer) {
+  //       muse.log(data.candidate);
+  //       peer.cnxn.addIceCandidate(new RTCIceCandidate(data.candidate));
+  //     }
+  //
+  //   });
+  //
+  // };
+  //
+  // exports.DataChannel = dataChannel;
+  //
+  // exports.
 
   provide(exports);
 });

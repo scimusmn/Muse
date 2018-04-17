@@ -18,7 +18,9 @@ obtain([], ()=> {
         if (this.loaded) {
           cb();
         } else {
-          this.addEventListener('ready', cb);
+          this.addEventListener('ready', (e)=> {
+            cb(e.detail);
+          });
         }
       }
 
