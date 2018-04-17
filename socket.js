@@ -55,10 +55,8 @@ obtain(['µ/events.js'], ({ Emitter })=> {
         _this.ws = new WebSocket(_this.address);
         _this.ws.onopen = function ()
         {
-          //console.log('opened websocket connection');
           clearInterval(_this.cnxnInterval);
           _this.ws.onmessage = function (evt) {
-            //console.log(evt.data);
             var data = JSON.parse(evt.data);
             for (var key in data) {
               if (data.hasOwnProperty(key)) {
@@ -66,7 +64,6 @@ obtain(['µ/events.js'], ({ Emitter })=> {
                   _this.timeOffset = (2 * data[key] - (_this.syncTime + Date.now())) / 2;
                   let serTime = new Date(Date.now() + _this.timeOffset);
                 } else {
-                  console.log(data[key]);
                   _this.emit(key, data[key]);
                 };
               }
@@ -75,7 +72,6 @@ obtain(['µ/events.js'], ({ Emitter })=> {
 
           _this.send = function (obj, data) {
             if (data) obj = { [obj]: data };
-            console.log(JSON.stringify(obj));
             _this.ws.send(JSON.stringify(obj));
           };
 
