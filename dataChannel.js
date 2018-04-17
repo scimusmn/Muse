@@ -131,7 +131,6 @@ obtain(['µ/socket.js', 'µ/events.js'], (socket, { Emitter })=> {
       _this.cnxn.onicecandidate = (evt)=> {
         if (evt.candidate) {
           signal.send('cnxn:candidate', {
-            //from: signal.id,
             to: _this.id,
             candidate: evt.candidate,
           });
@@ -139,6 +138,7 @@ obtain(['µ/socket.js', 'µ/events.js'], (socket, { Emitter })=> {
       };
 
       signal.on('cnxn:candidate', (data)=> {
+        console.log(data);
         if (data.from == _this.id) {
           _this.cnxn.addIceCandidate(new RTCIceCandidate(data.candidate));
         }

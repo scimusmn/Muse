@@ -9,12 +9,12 @@ obtain([], ()=> {
       }
 
       emit(evt, data) {
-        this.dispatchEvent(new CustomEvent(key, { detail: data }));
+        this.dispatchEvent(new CustomEvent(evt, { detail: data }));
       }
 
       on(evt, cb) {
         var ret = (e)=> {
-          cb(e.details);
+          cb(e.detail);
         };
 
         this.addEventListener(evt, ret);
@@ -27,4 +27,6 @@ obtain([], ()=> {
     }
     exports.Emitter = Emitter;
   }
+
+  provide(exports);
 });

@@ -64,6 +64,7 @@ obtain(['µ/events.js'], ({ Emitter })=> {
                   _this.timeOffset = (2 * data[key] - (_this.syncTime + Date.now())) / 2;
                   let serTime = new Date(Date.now() + _this.timeOffset);
                 } else {
+                  console.log(data[key]);
                   _this.emit(key, data[key]);
                 };
               }
