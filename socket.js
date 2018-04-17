@@ -55,8 +55,10 @@ obtain(['µ/events.js'], ({ Emitter })=> {
         _this.ws = new WebSocket(_this.address);
         _this.ws.onopen = function ()
         {
+          //console.log('opened websocket connection');
           clearInterval(_this.cnxnInterval);
           _this.ws.onmessage = function (evt) {
+            //console.log(evt.data);
             var data = JSON.parse(evt.data);
             for (var key in data) {
               if (data.hasOwnProperty(key)) {
