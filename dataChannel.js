@@ -1,20 +1,20 @@
 'use strict';
 
-obtain(['µ/socket.js'], (socket)=> {
+obtain(['µ/socket.js', 'µ/events.js'], (socket, { Emitter })=> {
 
-  var signal = socket.connect(window.location.hostname);
+  var signal = socket.connect(appData.config.cnxnURL);
 
   if (!window.muse.peers) {
     window.muse.peers = [];
 
-    window.muse.peerManager = new EventTarget();
+    window.muse.peerManager = new Emitter();
 
     signal.addListener('cnxn:description', (data)=> {
       var peer = muse.peers.find(per=>per.id == data.from);
       if (!peer) {
         peer = new Peer({ remoteId: data.from, isClient: true });
         muse.peers.push(peer);
-        muse.peerManager.dispatchEvent(new CustomEvent('internal:new', { detail: peer }));
+        muse.peerManager.emit('internal:new', peer);
       }
 
       peer.handleRemoteDescription(data);
@@ -22,14 +22,11 @@ obtain(['µ/socket.js'], (socket)=> {
   }
 
   exports.onPeerAdded = (cb)=> {
-    muse.peerManager.addEventListener('internal:new', (e)=> {
-      cb(e.details);
-    });
+    muse.peerManager.on('internal:new', cb);
   };
 
   exports.onPeerDisconnect = (cb)=> {
-    muse.peerManager.addEventListener('internal:new', (e)=> {
-      var which = e.details;
+    muse.peerManager.on('internal:new', (which)=> {
       cb(which);
       muse.peers = muse.peers.filter(peer=>peer.id != which.id);
     });
@@ -52,10 +49,10 @@ obtain(['µ/socket.js'], (socket)=> {
       url: 'turn:numb.viagenie.ca',
       credential: 'RTCBook!',
       username: 'ajhg.pub@gmail.com',
-    },],
+    }, ],
   };
 
-  class Peer extends EventTarget {
+  class Peer extends Emitter {
     constructor(info) {
       super();
 
@@ -84,7 +81,7 @@ obtain(['µ/socket.js'], (socket)=> {
     };
 
     logError(error) {
-      this.dispatchEvent(new CustomEvent('internal:error', { detail: error }));
+      this.emit('internal:error', error);
     }
 
     handleLocalDescription (desc) {
@@ -159,18 +156,18 @@ obtain(['µ/socket.js'], (socket)=> {
       if (!_this.useSignal) {
         _this.channel.onopen = ()=> {
           _this.connected = true;
-          _this.dispatchEvent(new CustomEvent('internal:connect', { detail: _this }));
+          _this.emit('internal:connect',  _this);
         };
 
         _this.channel.onclose = ()=> {
-          _this.dispatchEvent(new CustomEvent('internal:close', { detail: false }));
+          _this.emit('internal:close', false);
         };
 
         _this.channel.onmessage = function (evt) {
           var data = JSON.parse(evt.data);
           for (var key in data) {
             if (data.hasOwnProperty(key)) {
-              _this.dispatchEvent(new CustomEvent(key, { detail: data[key] }));
+              _this.emit(key,  data[key]);
             }
           }
         };
@@ -192,44 +189,28 @@ obtain(['µ/socket.js'], (socket)=> {
           if (data.from == _this.id) {
             for (var key in data) {
               if (data.hasOwnProperty(key)) {
-                _this.dispatchEvent(new CustomEvent(key, { detail: data[key] }));
+                _this.emit(key, data[key]);
               }
             }
           }
         });
 
         _this.connected = true;
-        _this.dispatchEvent(new CustomEvent('internal:connect', { detail: _this }));
+        _this.emit('internal:connect', _this);
       }
-    }
-
-    on(evt, cb) {
-      this.addEventListener(evt, (e)=> {
-        cb(e.detail);
-      });
-    }
-
-    addListener(evt, cb) {
-      this.on(evt, cb);
     }
 
     set onconnect(cb) {
       if (this.connected) cb();
-      else this.addEventListener('internal:connect', (e)=> {
-        cb();
-      });
+      else this.on('internal:connect', cb);
     }
 
     set onclose(cb) {
-      this.addEventListener('internal:close', (e)=> {
-        cb();
-      });
+      this.on('internal:close', cb);
     }
 
     set onconnectionerror(cb) {
-      this.addEventListener('internal:error', (e)=> {
-        cb(e.detail);
-      });
+      this.on('internal:error', cb);
     }
   }
 

@@ -1,9 +1,11 @@
-obtain([], ()=> {
+'use strict';
+
+obtain(['µ/events.js'], ({ Emitter })=> {
   if (!window.muse.sockets) {
     window.muse.sockets = [];
   }
 
-  class SingleSocket extends EventTarget {
+  class SingleSocket extends Emitter {
     constructor(addr) {
       super();
 
@@ -11,17 +13,9 @@ obtain([], ()=> {
       this.timeOffset = 0;
       this.connected = false;
 
+      this.address = addr;
+
       this.connect(addr);
-    }
-
-    addListener(evt, cb) {
-      this.on(evt, cb);
-    }
-
-    on(evt, cb) {
-      this.addEventListener(evt, (e)=> {
-        cb(e.detail);
-      });
     }
 
     synchronize () {
@@ -32,20 +26,20 @@ obtain([], ()=> {
 
     set onconnect(cb) {
       if (this.connected) cb();
-      else this.addEventListener('internal:connect', (e)=> {
+      else this.on('internal:connect', ()=> {
         cb();
       });
     }
 
     set onclose(cb) {
-      this.addEventListener('internal:close', (e)=> {
+      this.on('internal:close', ()=> {
         cb();
       });
     }
 
     set onerror(cb) {
-      this.addEventListener('internal:error', (e)=> {
-        cb(e.detail);
+      this.on('internal:error', (data)=> {
+        cb(data);
       });
     }
 
@@ -57,7 +51,6 @@ obtain([], ()=> {
 
     connect(addr) {
       var _this = this;
-      if (addr) _this.address = ((muse.useSSL) ? 'wss://' : 'ws://') + addr;
       if ('WebSocket' in window) {
         _this.ws = new WebSocket(_this.address);
         _this.ws.onopen = function ()
@@ -71,7 +64,7 @@ obtain([], ()=> {
                   _this.timeOffset = (2 * data[key] - (_this.syncTime + Date.now())) / 2;
                   let serTime = new Date(Date.now() + _this.timeOffset);
                 } else {
-                  _this.dispatchEvent(new CustomEvent(key, { detail: data[key] }));
+                  _this.emit(key, data[key]);
                 };
               }
             }
@@ -79,25 +72,19 @@ obtain([], ()=> {
 
           _this.send = function (obj, data) {
             if (data) obj = { [obj]: data };
-            ws.send(JSON.stringify(obj));
+            _this.ws.send(JSON.stringify(obj));
           };
 
           _this.close = ()=> {
-            ws.close();
+            _this.ws.close();
           };
 
-          //if (!_this.connected) _this.onConnect();
-
-          //_this.synchronize();
-          //if (_this.id) _this.send({ _id: _this.id });
-
-          _this.dispatchEvent(new CustomEvent('internal:connect', { detail: _this }));
-
           _this.connected = true;
+          _this.emit('internal:connect', _this);
         };
 
         _this.ws.onerror = function (error) {
-          _this.dispatchEvent(new CustomEvent('internal:error', { detail: error }));
+          _this.emit('internal:error', error);
           clearInterval(_this.connectInterval);
           _this.connectInterval = setInterval(_this.connect.bind(_this), 2000);
         };
@@ -106,7 +93,7 @@ obtain([], ()=> {
           _this.connected = false;
           _this.ws = null;
           console.log('disconnected');
-          _this.dispatchEvent(new CustomEvent('internal:close', { detail: false }));
+          _this.emit('internal:close', false);
         };
       } else {
         clearInterval(_this.connectInterval);
@@ -116,8 +103,13 @@ obtain([], ()=> {
   };
 
   exports.connect = (addr)=> {
-    var ret = muse.sockets.find(sock=>sock.address = addr);
-    if (!ret) ret = new SingleSocket(addr);
+    addr = ((muse.useSSL) ? 'wss://' : 'ws://') + addr;
+    var ret = muse.sockets.find(sock=>sock.address == addr);
+    if (!ret) {
+      ret = new SingleSocket(addr);
+      muse.sockets.push(ret);
+    }
+
     return ret;
 
   };
