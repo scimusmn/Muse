@@ -14,12 +14,15 @@ obtain(['µ/socket.js', 'µ/events.js'], (socket, { Emitter })=> {
     signal = sig;
 
     signal.addListener('cnxn:description', (data)=> {
+      console.log('received remote description');
       var peer = muse.peers.find(per=>per.id == data.from);
       if (!peer) {
         peer = new Peer({ remoteId: data.from, isClient: true });
         muse.peers.push(peer);
         muse.peerManager.emit('internal:new', peer);
       }
+
+      console.log(data);
 
       peer.handleRemoteDescription(data);
     });
@@ -82,6 +85,7 @@ obtain(['µ/socket.js', 'µ/events.js'], (socket, { Emitter })=> {
       var _this = this;
       _this.cnxn.setLocalDescription(desc)
         .then(()=> {
+          console.log('sending description');
           signal.send('cnxn:description', {
             //from: signal.id,
             to: _this.id,
