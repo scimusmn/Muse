@@ -53,7 +53,7 @@ obtain(['µ/socket.js', 'µ/events.js'], (socket, { Emitter })=> {
       url: 'turn:numb.viagenie.ca',
       credential: 'RTCBook!',
       username: 'ajhg.pub@gmail.com',
-    },],
+    }, ],
   };
 
   class Peer extends Emitter {
@@ -70,18 +70,8 @@ obtain(['µ/socket.js', 'µ/events.js'], (socket, { Emitter })=> {
     }
 
     connect() {
-      var peer = muse.peers.find(per=>per.id == remoteId);
-      if (!peer) {
-        var newPeer = createPeer({ remoteId: remoteId });
-        setupConnection(newPeer);
-
-        configureChannel(newPeer);
-
-        _this.cnxn.createOffer().then(_this.handleLocalDescription.bind(_this))
-        .catch(_this.logError.bind(_this));
-
-        return newPeer;
-      } else return peer;
+      this.cnxn.createOffer().then(this.handleLocalDescription.bind(this))
+      .catch(this.logError.bind(this));
     };
 
     logError(error) {
@@ -148,7 +138,7 @@ obtain(['µ/socket.js', 'µ/events.js'], (socket, { Emitter })=> {
         }
       };
 
-      signal.addListener('cnxn:candidate', (data)=> {
+      signal.on('cnxn:candidate', (data)=> {
         if (data.from == _this.id) {
           _this.cnxn.addIceCandidate(new RTCIceCandidate(data.candidate));
         }
