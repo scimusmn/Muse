@@ -32,10 +32,14 @@ obtain(['µ/socket.js', 'µ/events.js'], (socket, { Emitter })=> {
   };
 
   exports.onPeerDisconnect = (cb)=> {
-    muse.peerManager.on('internal:new', (which)=> {
+    muse.peerManager.on('internal:disconnect', (which)=> {
       cb(which);
-      muse.peers = muse.peers.filter(peer=>peer.id != which.id);
     });
+  };
+
+  var onDisconnect = (which)=> {
+    muse.peerManager.emit('internal:disconnect', which);
+    muse.peers = muse.peers.filter(peer=>peer.id != which.id);
   };
 
   exports.getPeer = (data)=> {
@@ -157,6 +161,7 @@ obtain(['µ/socket.js', 'µ/events.js'], (socket, { Emitter })=> {
         };
 
         _this.channel.onclose = ()=> {
+          onDisconnect(_this);
           _this.emit('internal:close', false);
         };
 
