@@ -12,6 +12,18 @@ obtain([], ()=> {
         this.dispatchEvent(new CustomEvent(evt, { detail: data }));
       }
 
+      once(evt, cb) {
+        var ret = (e)=> {
+          console.log('removing listener');
+          this.removeEventListener(evt, ret);
+          cb(e.detail);
+
+        };
+
+        this.addEventListener(evt, ret);
+        return ret;
+      }
+
       on(evt, cb) {
         var ret = (e)=> {
           cb(e.detail);

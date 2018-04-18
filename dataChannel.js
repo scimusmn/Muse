@@ -80,6 +80,10 @@ obtain(['µ/socket.js', 'µ/events.js'], (socket, { Emitter })=> {
       this.emit('internal:error', error);
     }
 
+    close() {
+      if (this.channel) this.channel.close();
+    }
+
     handleLocalDescription (desc) {
       var _this = this;
       _this.cnxn.setLocalDescription(desc)
@@ -195,7 +199,7 @@ obtain(['µ/socket.js', 'µ/events.js'], (socket, { Emitter })=> {
 
     set onconnect(cb) {
       if (this.connected) cb();
-      else this.on('internal:connect', cb);
+      else this.once('internal:connect', cb);
     }
 
     set onclose(cb) {
