@@ -27,8 +27,14 @@ obtain(['µ/socket.js', 'µ/events.js'], (socket, { Emitter })=> {
     });
   };
 
+  exports.connecting = ()=>!muse.peer.reduce((acc, peer)=>peer != 'checking' && acc, true);
+
   exports.onPeerAdded = (cb)=> {
     muse.peerManager.on('internal:new', cb);
+  };
+
+  exports.onPeerConnect = (cb)=> {
+    muse.peerManager.on('internal:connect', cb);
   };
 
   exports.onPeerDisconnect = (cb)=> {
@@ -59,7 +65,7 @@ obtain(['µ/socket.js', 'µ/events.js'], (socket, { Emitter })=> {
       url: 'turn:numb.viagenie.ca',
       credential: 'RTCBook!',
       username: 'ajhg.pub@gmail.com',
-    }, ],
+    },],
   };
 
   class Peer extends Emitter {
@@ -88,6 +94,10 @@ obtain(['µ/socket.js', 'µ/events.js'], (socket, { Emitter })=> {
       if (this.channel) this.channel.close();
     }
 
+    get state() {
+      return this.cnxn.iceConnectionState;
+    }
+
     handleLocalDescription (desc) {
       var _this = this;
       _this.cnxn.setLocalDescription(desc)
@@ -105,7 +115,7 @@ obtain(['µ/socket.js', 'µ/events.js'], (socket, { Emitter })=> {
     handleRemoteDescription(data) {
       var _this = this;
       if (data.from == _this.id) {
-        if (data.hostInfo) peer.info = data.hostInfo;
+        if (data.hostInfo) _this.info = data.hostInfo;
         _this.cnxn.setRemoteDescription(new RTCSessionDescription(data.sdp))
         .then(()=> {
           // if we received an offer, we need to answer
@@ -158,6 +168,7 @@ obtain(['µ/socket.js', 'µ/events.js'], (socket, { Emitter })=> {
         _this.channel.onopen = ()=> {
           _this.connected = true;
           _this.emit('internal:connect',  _this);
+          muse.peerManager.emit('internal:connect', _this);
         };
 
         _this.channel.onclose = ()=> {
@@ -200,6 +211,11 @@ obtain(['µ/socket.js', 'µ/events.js'], (socket, { Emitter })=> {
         _this.connected = true;
         _this.emit('internal:connect', _this);
       }
+    }
+
+    set whenConnected(cb) {
+      if (this.connected) cb();
+      else this.once('internal:connect', cb);
     }
 
     set onconnect(cb) {

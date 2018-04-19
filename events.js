@@ -17,7 +17,6 @@ obtain([], ()=> {
           console.log('removing listener');
           this.removeEventListener(evt, ret);
           cb(e.detail);
-
         };
 
         this.addEventListener(evt, ret);
