@@ -189,6 +189,7 @@ obtain(['µ/socket.js', 'µ/events.js'], (socket, { Emitter })=> {
           if (typeof msg == 'string') msg = { [msg]: data };
           _this.channel.send(JSON.stringify(msg));
         };
+
       } else {
 
         _this.send = (data)=> {

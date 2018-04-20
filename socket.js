@@ -15,7 +15,7 @@ obtain(['µ/events.js'], ({ Emitter })=> {
 
       this.address = addr;
 
-      this.connect(addr);
+      //this.connect(addr);
     }
 
     synchronize () {
@@ -49,7 +49,7 @@ obtain(['µ/events.js'], ({ Emitter })=> {
       return Date.now() + _this.timeOffset;
     }
 
-    connect(addr) {
+    connect() {
       var _this = this;
       if ('WebSocket' in window) {
         _this.ws = new WebSocket(_this.address);
@@ -102,7 +102,7 @@ obtain(['µ/events.js'], ({ Emitter })=> {
     }
   };
 
-  exports.connect = (addr)=> {
+  exports.get = (addr)=> {
     addr = ((muse.useSSL) ? 'wss://' : 'ws://') + addr;
     var ret = muse.sockets.find(sock=>sock.address == addr);
     if (!ret) {
