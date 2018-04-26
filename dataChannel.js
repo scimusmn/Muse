@@ -136,6 +136,7 @@ obtain(['µ/socket.js', 'µ/events.js'], (socket, { Emitter })=> {
       };
 
       _this.cnxn.oniceconnectionstatechange = ()=> {
+        console.log(_this.cnxn.iceConnectionState);
         if (_this.cnxn.iceConnectionState == 'connected') {
           //connected
         }else if (_this.cnxn.iceConnectionState == 'failed' && !_this.connected) {
@@ -143,6 +144,9 @@ obtain(['µ/socket.js', 'µ/events.js'], (socket, { Emitter })=> {
           _this.useSignal = true;
           _this.connected = true;
           _this.configureChannel();
+        } else if (_this.cnxn.iceConnectionState == 'disconnected') {
+          onDisconnect(_this);
+          _this.emit('internal:close', false);
         }
       };
 
