@@ -1,8 +1,8 @@
 
-obtain([`${__dirname}/museElement.js`], ({ MuseElement })=> {
+obtain([`${__dirname}/museElement.js`, 'path'], ({ MuseElement }, path)=> {
   if (!customElements.get('muse-growl')) {
     var dir = '';
-    if (__dirname) dir = __dirname;
+    if (__dirname) dir = path.resolve(__dirname);
     else dir = exports.src.substr(0, exports.src.lastIndexOf('/'));
 
     //window.loadCSS(__dirname + '/button.css');
