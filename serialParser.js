@@ -6,6 +6,7 @@ obtain(['µ/serial.js'], (ser)=> {
   const REPORT = 126;
   const BROADCAST = 127;
 
+  // function for doing error checked serial communication
   exports.serialParser = function () {
     var _this = this;
     var serial = new ser.Serial(Buffer.from([START_FLAG + STOP_FLAG]));

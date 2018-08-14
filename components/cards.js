@@ -26,8 +26,8 @@ obtain([`${__dirname}/museElement.js`], ({ MuseElement })=> {
         var _this = this;
 
         if (!_this.root) {
-
           this.makeTransitionState('focused');
+          this.makeTransitionState('show', 'hide');
           this.root = _this.attachShadow({ mode: 'open' });
           this.root.innerHTML = `<style> @import "${dir}/css/cards.css";</style>`;
 
