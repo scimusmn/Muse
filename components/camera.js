@@ -58,7 +58,7 @@ obtain(['µ/RecordRTC.min.js'], ()=> {
           _this.video = µ('+video', _this.root);
 
           _this.init((stream)=> {
-            _this.stream = window.URL.createObjectURL(stream) || stream;
+            _this.stream = stream;
 
             _this.video.src = _this.stream;
 
