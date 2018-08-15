@@ -6,8 +6,11 @@ obtain(['µ/RecordRTC.min.js'], ()=> {
         super();
       }
 
-      record() {
+      clear() {
         this.recorder.clearRecordedData();
+      }
+
+      record() {
         this.isRecording = true;
         this.recorder.startRecording();
       }
@@ -62,9 +65,9 @@ obtain(['µ/RecordRTC.min.js'], ()=> {
 
             _this.video.srcObject = _this.stream;
 
-            _this.play();
-
             _this.video.onloadedmetadata = ()=> {
+
+              _this.play();
 
               _this.recorder = window.RecordRTC(stream, {
                 type: 'video',
