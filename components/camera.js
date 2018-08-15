@@ -8,8 +8,21 @@ obtain(['µ/RecordRTC.min.js'], ()=> {
 
       record() {
         this.recorder.destroy();
-        this.isRecording = true;
-        this.recorder.startRecording();
+
+        if (this.videoLoaded) {
+          _this.recorder = window.RecordRTC(stream, {
+            type: 'video',
+            video: _this.video,
+            canvas: {
+              width: _this.video.videoWidth,
+              height: _this.video.videoHeight,
+            },
+          });
+
+          this.isRecording = true;
+          this.recorder.startRecording();
+        }
+
       }
 
       stopRecord() {
@@ -65,15 +78,8 @@ obtain(['µ/RecordRTC.min.js'], ()=> {
             _this.play();
 
             _this.video.onloadedmetadata = ()=> {
+              _this.videoLoaded = true;
 
-              _this.recorder = window.RecordRTC(stream, {
-                type: 'video',
-                video: _this.video,
-                canvas: {
-                  width: _this.video.videoWidth,
-                  height: _this.video.videoHeight,
-                },
-              });
             };
 
           });
