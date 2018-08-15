@@ -1,11 +1,6 @@
 
 obtain([], ()=> {
   if (!customElements.get('but-ton')) {
-    var dir = '';
-    if (__dirname) dir = __dirname;
-    else dir = exports.src.substr(0, exports.src.lastIndexOf('/'));
-
-    //window.loadCSS(__dirname + '/button.css');
 
     class Button extends HTMLElement {
       constructor() {
@@ -28,7 +23,7 @@ obtain([], ()=> {
         if (!_this.shadowRoot) {
           _this.root = _this.attachShadow({ mode: 'open' });
 
-          _this.root.innerHTML = `<style> @import "${dir}/css/button.css";</style>`;
+          _this.root.innerHTML = `<style> @import "${µdir}/components/css/button.css";</style>`;
 
           _this.display = µ('+slot', _this.root);
 

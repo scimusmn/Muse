@@ -8,7 +8,7 @@ class ProgressRing extends HTMLElement {
          <circle/>
       </svg>
 
-      <style> @import "${µdir}/css/progress.css";</style>
+      <style> @import "${µdir}/components/css/progress.css";</style>
     `;
   }
 
@@ -48,7 +48,7 @@ class ProgressBox extends HTMLElement {
          <rect/>
       </svg>
 
-      <style> @import "${µdir}/css/progressBox.css";</style>
+      <style> @import "${µdir}/components/css/progressBox.css";</style>
     `;
   }
 

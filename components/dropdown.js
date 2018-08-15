@@ -82,7 +82,7 @@ obtain([], ()=> {
         if (!this.root) {
           this.root = _this.attachShadow({ mode: 'open' });
 
-          this.root.innerHTML = `<style> @import "${__dirname}/css/dropdown.css";</style>`;
+          this.root.innerHTML = `<style> @import "${µdir}/components/css/dropdown.css";</style>`;
 
           _this.tray = µ('+div', this.root);
           _this.tray.className = 'tray';
