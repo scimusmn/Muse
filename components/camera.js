@@ -7,6 +7,7 @@ obtain(['µ/RecordRTC.min.js'], ()=> {
       }
 
       record() {
+        this.recorder.destroy();
         this.isRecording = true;
         this.recorder.startRecording();
       }
