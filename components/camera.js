@@ -55,7 +55,7 @@ obtain(['µ/RecordRTC.min.js'], ()=> {
         if (!_this.shadowRoot) {
           _this.root = _this.attachShadow({ mode: 'open' });
 
-          _this.root.innerHTML = `<style> @import "${dir}/css/camera.css";</style>`;
+          _this.root.innerHTML = `<style> @import "${µdir}/components/css/camera.css";</style>`;
 
           _this.video = µ('+video', _this.root);
 
