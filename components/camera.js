@@ -7,7 +7,7 @@ obtain(['µ/RecordRTC.min.js'], ()=> {
       }
 
       record() {
-        this.recorder.destroy();
+        if (this.recorder) this.recorder.destroy();
 
         if (this.videoLoaded) {
           _this.recorder = window.RecordRTC(stream, {
