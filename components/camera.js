@@ -11,7 +11,7 @@ obtain(['µ/RecordRTC.min.js'], ()=> {
         if (this.recorder) this.recorder.destroy();
 
         if (this.videoLoaded) {
-          _this.recorder = window.RecordRTC(stream, {
+          _this.recorder = window.RecordRTC(_this.video.src, {
             type: 'video',
             video: _this.video,
             canvas: {
