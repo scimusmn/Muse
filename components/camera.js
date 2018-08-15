@@ -1,8 +1,5 @@
 obtain(['µ/RecordRTC.min.js'], ()=> {
   if (!customElements.get('cam-era')) {
-    var dir = '';
-    if (__dirname) dir = __dirname;
-    else dir = exports.src.substr(0, exports.src.lastIndexOf('/'));
 
     class Camera extends HTMLElement {
       constructor() {

@@ -1,9 +1,6 @@
 
 obtain([`${__dirname}/museElement.js`], ({ MuseElement })=> {
   if (!customElements.get('muse-card')) {
-    var dir = '';
-    if (__dirname) dir = __dirname;
-    else dir = exports.src.substr(0, exports.src.lastIndexOf('/'));
 
     //window.loadCSS(__dirname + '/button.css');
 
@@ -29,7 +26,7 @@ obtain([`${__dirname}/museElement.js`], ({ MuseElement })=> {
           this.makeTransitionState('focused');
           this.makeTransitionState('show', 'hide');
           this.root = _this.attachShadow({ mode: 'open' });
-          this.root.innerHTML = `<style> @import "${dir}/css/cards.css";</style>`;
+          this.root.innerHTML = `<style> @import "${µdir}/css/cards.css";</style>`;
 
           _this.display = µ('+div', _this.root);
           µ('+slot', _this.display);

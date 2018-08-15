@@ -1,7 +1,3 @@
-var dir = '';
-if (__dirname) dir = __dirname;
-else dir = exports.src.substr(0, exports.src.lastIndexOf('/'));
-
 class ProgressRing extends HTMLElement {
   constructor() {
     super();
@@ -12,7 +8,7 @@ class ProgressRing extends HTMLElement {
          <circle/>
       </svg>
 
-      <style> @import "${dir}/css/progress.css";</style>
+      <style> @import "${µdir}/css/progress.css";</style>
     `;
   }
 
@@ -52,7 +48,7 @@ class ProgressBox extends HTMLElement {
          <rect/>
       </svg>
 
-      <style> @import "${dir}/css/progressBox.css";</style>
+      <style> @import "${µdir}/css/progressBox.css";</style>
     `;
   }
 
