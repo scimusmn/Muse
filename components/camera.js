@@ -60,7 +60,7 @@ obtain(['µ/RecordRTC.min.js'], ()=> {
           _this.init((stream)=> {
             _this.stream = stream;
 
-            _this.video.src = _this.stream;
+            _this.video.srcObject = _this.stream;
 
             _this.play();
 
