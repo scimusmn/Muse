@@ -52,7 +52,7 @@ obtain(['µ/events.js'], ({ Emitter })=> {
     connect() {
       var _this = this;
       if ('WebSocket' in window) {
-        _this.ws = new WebSocket(_this.address);
+        if (!_this.ws) _this.ws = new WebSocket(_this.address);
         _this.ws.onopen = function ()
         {
           clearInterval(_this.cnxnInterval);
@@ -81,6 +81,7 @@ obtain(['µ/events.js'], ({ Emitter })=> {
 
           _this.connected = true;
           _this.emit('internal:connect', _this);
+          clearInterval(_this.connectInterval);
         };
 
         _this.ws.onerror = function (error) {
