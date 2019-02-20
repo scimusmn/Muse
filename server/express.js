@@ -18,6 +18,7 @@ if (!window.muse.server) window.muse.server = {
   https: null,
   sessionParser: null,
   express: null,
+  staticRoute: ()=>{};
 };
 
 var server = window.muse.server;
@@ -30,6 +31,10 @@ obtain(obtains, (express, bodyParser, fs, fileUpload, session, https, http, path
       saveUninitialized: true,
       cookie: { httpOnly: true, secure: false },
     });
+
+    server.staticRoute = (route, location)=>{
+      muse.server.base.use(route, express.static(path.join(location)));
+    }
 
     server.base = express();
     server.router = express.Router();
