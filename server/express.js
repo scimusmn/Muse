@@ -47,8 +47,8 @@ obtain(obtains, (express, bodyParser, fs, fileUpload, session, https, http, path
 
     server.base.use(server.sessionParser);
 
-    muse.server.base.use('', express.static(path.join(root, 'app/client')));
-    muse.server.base.use('/common', express.static(path.join(root, 'app/common')));
+    server.base.use('', express.static(path.join(root, 'app/client')));
+    server.base.use('/common', express.static(path.join(root, 'app/common')));
 
     server.base.use(server.router);
 
@@ -56,8 +56,8 @@ obtain(obtains, (express, bodyParser, fs, fileUpload, session, https, http, path
 
     if (muse.useSSL) {
       const options = {
-        cert: fs.readFileSync(`${window.tld}/sslcert/fullchain.pem`),
-        key: fs.readFileSync(`${window.tld}/sslcert/privkey.pem`),
+        cert: fs.readFileSync(`${appRoot}/sslcert/fullchain.pem`),
+        key: fs.readFileSync(`${appRoot}/sslcert/privkey.pem`),
       };
 
       server.https = https.createServer(options, server.base).listen(443);
