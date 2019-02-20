@@ -89,23 +89,15 @@ obtain([], ()=> {
 
     _this.onMessage = () => {console.log('test');};
 
-    _this.onPortNotFound = function (ports) {
-    };
+    _this.onPortNotFound = function (ports) {};
 
-    _this.write = (str)=> {
-    };
+    _this.write = (str)=> {};
 
-    _this.send = (arr) => {
+    _this.send = (arr) => {};
 
-    };
+    var openByName = (portName, baud) => {};
 
-    var openByName = (portName, baud) => {
-
-    };
-
-    _this.open = (props) => {
-
-    };
+    _this.open = (props) => {};
 
   };
 
