@@ -20,31 +20,33 @@ if (!window.muse.server) window.muse.server = {
   express: null,
 };
 
+var server = window.muse.server;
+
 obtain(obtains, (express, bodyParser, fs, fileUpload, session, https, http, path)=> {
-  if (!window.muse.server.base) {
-    muse.server.sessionParser = session({
+  if (!server.base) {
+    server.sessionParser = session({
       secret: 'secret',
       resave: true,
       saveUninitialized: true,
       cookie: { httpOnly: true, secure: false },
     });
 
-    muse.server.base = express();
-    muse.server.router = express.Router();
+    server.base = express();
+    server.router = express.Router();
 
-    muse.server.router.use(bodyParser.json());
-    muse.server.router.use(fileUpload());
+    server.router.use(bodyParser.json());
+    server.router.use(fileUpload());
 
-    muse.server.base.use(window.expressServer.sessionParser);
+    server.base.use(server.sessionParser);
 
-    muse.server.base.set('view engine', 'pug');
+    server.base.set('view engine', 'pug');
 
     //muse.server.base.use('', express.static(path.join(root, '../../../client')));
     //muse.server.base.use('/common', express.static(path.join(root, '../../../common')));
 
-    muse.server.base.use(muse.server.router);
+    server.base.use(server.router);
 
-    var httpApp = muse.server.base;
+    var httpApp = server.base;
 
     if (muse.useSSL) {
       const options = {
@@ -52,25 +54,25 @@ obtain(obtains, (express, bodyParser, fs, fileUpload, session, https, http, path
         key: fs.readFileSync(`${global.tld}/sslcert/privkey.pem`),
       };
 
-      muse.server.https = https.createServer(options, muse.server.base).listen(443);
+      server.https = https.createServer(options, server.base).listen(443);
 
       httpApp = function (req, res) {
         res.writeHead(307, { Location: 'https://' + req.headers['host'] + req.url });
         res.end();
       };
 
-    } else muse.server.https = {};
+    } else server.https = {};
 
-    muse.server.http = http.createServer(httpApp).listen(80);
+    server.http = http.createServer(httpApp).listen(80);
 
-    muse.server.express = express;
+    server.express = express;
   };
 
-  exports.base = muse.server.base;
-  exports.router = muse.server.router;
-  exports.express = muse.server.express;
-  exports.http = muse.server.http;
-  exports.https = muse.server.https;
-  exports.sessionParser = muse.server.sessionParser;
+  exports.base = server.base;
+  exports.router = server.router;
+  exports.express = server.express;
+  exports.http = server.http;
+  exports.https = server.https;
+  exports.sessionParser = server.sessionParser;
 
 });
