@@ -59,19 +59,19 @@ obtain(['serialport'], (com)=> {
 
     _this.open = (props) => {
       var name = null;
-      // com.list(function (err, ports) {
-      //   ports.forEach(function (port) {
-      //     console.log(port);
-      //     if (port.comName.includes(props.name) ||
-      //         (port.manufacturer && props.manufacturer &&
-      //         port.manufacturer.toLowerCase() == props.manufacturer.toLowerCase()) ||
-      //         (port.serialNumber && port.serialNumber == props.serialNumber)
-      //       ) name = port.comName;
-      //   });
-      //
-      //   if (!name) _this.onPortNotFound(ports);
-      //   else openByName(name, props.baud);
-      // });
+      com.list(function (err, ports) {
+        ports.forEach(function (port) {
+          console.log(port);
+          if (port.comName.includes(props.name) ||
+              (port.manufacturer && props.manufacturer &&
+              port.manufacturer.toLowerCase() == props.manufacturer.toLowerCase()) ||
+              (port.serialNumber && port.serialNumber == props.serialNumber)
+            ) name = port.comName;
+        });
+
+        if (!name) _this.onPortNotFound(ports);
+        else openByName(name, props.baud);
+      });
     };
 
   };
