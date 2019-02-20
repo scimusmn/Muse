@@ -1,5 +1,7 @@
 if (!window) var window = global;
 
+var root = require('electron').remote.getGlobal('appRoot');
+
 var obtains = [
   'express',
   'body-parser',
@@ -45,10 +47,8 @@ obtain(obtains, (express, bodyParser, fs, fileUpload, session, https, http, path
 
     server.base.use(server.sessionParser);
 
-    server.base.set('view engine', 'pug');
-
-    //muse.server.base.use('', express.static(path.join(root, '../../../client')));
-    //muse.server.base.use('/common', express.static(path.join(root, '../../../common')));
+    muse.server.base.use('', express.static(path.join(root, 'app/client')));
+    muse.server.base.use('/common', express.static(path.join(root, 'app/common')));
 
     server.base.use(server.router);
 
@@ -56,8 +56,8 @@ obtain(obtains, (express, bodyParser, fs, fileUpload, session, https, http, path
 
     if (muse.useSSL) {
       const options = {
-        cert: fs.readFileSync(`${global.tld}/sslcert/fullchain.pem`),
-        key: fs.readFileSync(`${global.tld}/sslcert/privkey.pem`),
+        cert: fs.readFileSync(`${window.tld}/sslcert/fullchain.pem`),
+        key: fs.readFileSync(`${window.tld}/sslcert/privkey.pem`),
       };
 
       server.https = https.createServer(options, server.base).listen(443);
