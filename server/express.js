@@ -18,11 +18,11 @@ if (!window.muse.server) window.muse.server = {
   https: null,
   sessionParser: null,
   express: null,
-  staticRoute: ()=>{};
+  staticRoute: ()=> {},
 };
 
 var server = window.muse.server;
-//module.exports = server;
+module.exports = server;
 
 obtain(obtains, (express, bodyParser, fs, fileUpload, session, https, http, path)=> {
   if (!server.base) {
@@ -33,9 +33,9 @@ obtain(obtains, (express, bodyParser, fs, fileUpload, session, https, http, path
       cookie: { httpOnly: true, secure: false },
     });
 
-    server.staticRoute = (route, location)=>{
+    server.staticRoute = (route, location)=> {
       muse.server.base.use(route, express.static(path.join(location)));
-    }
+    };
 
     server.base = express();
     server.router = express.Router();
@@ -74,12 +74,12 @@ obtain(obtains, (express, bodyParser, fs, fileUpload, session, https, http, path
     server.express = express;
   };
 
-  exports.base = server.base;
-  exports.router = server.router;
-  exports.express = server.express;
-  exports.http = server.http;
-  exports.https = server.https;
-  exports.sessionParser = server.sessionParser;
-  exports.staticRoute = server.staticRoute;
+  // exports.base = server.base;
+  // exports.router = server.router;
+  // exports.express = server.express;
+  // exports.http = server.http;
+  // exports.https = server.https;
+  // exports.sessionParser = server.sessionParser;
+  // exports.staticRoute = server.staticRoute;
 
 });
