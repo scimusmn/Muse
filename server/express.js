@@ -21,7 +21,7 @@ if (!window.muse.server) window.muse.server = {
 };
 
 obtain(obtains, (express, bodyParser, fs, fileUpload, session, https, http, path)=> {
-  exports.setup = (root)=> {
+  if (!window.muse.server.base) {
     muse.server.sessionParser = session({
       secret: 'secret',
       resave: true,
