@@ -22,7 +22,7 @@ if (!window.muse.server) window.muse.server = {
 };
 
 var server = window.muse.server;
-module.exports = server;
+//module.exports = server;
 
 obtain(obtains, (express, bodyParser, fs, fileUpload, session, https, http, path)=> {
   if (!server.base) {
@@ -74,12 +74,12 @@ obtain(obtains, (express, bodyParser, fs, fileUpload, session, https, http, path
     server.express = express;
   };
 
-  // exports.base = server.base;
-  // exports.router = server.router;
-  // exports.express = server.express;
-  // exports.http = server.http;
-  // exports.https = server.https;
-  // exports.sessionParser = server.sessionParser;
-  // exports.staticRoute = server.staticRoute;
+  exports.base = server.base;
+  exports.router = server.router;
+  exports.express = server.express;
+  exports.http = server.http;
+  exports.https = server.https;
+  exports.sessionParser = server.sessionParser;
+  exports.staticRoute = server.staticRoute;
 
 });
