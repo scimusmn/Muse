@@ -1,4 +1,4 @@
-obtain(['events'], (EventEmitter)=> {
+obtain(['µ/serialParser.js', 'events'], ({ serialParser }, EventEmitter)=> {
   const DIGI_READ = 1;
   const ANA_READ = 2;
   const DIGI_WRITE = 4;
