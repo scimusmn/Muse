@@ -1,6 +1,6 @@
 'use strict';
 
-obtain(['serialport'], (com)=> {
+obtain([], ()=> {
   exports.Serial = function (delim = '\r\n') {
 
     //const parser = new com.parsers.Regex({ regex: /[\r\n]+/ });
