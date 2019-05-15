@@ -114,8 +114,11 @@ obtain(['µ/serialParser.js', 'events'], ({ serialParser }, EventEmitter)=> {
         }
       };
 
-      if (conf.name) parser.setup({ name: conf.name, baud: 115200 });
-      else if (conf.manufacturer) parser.setup({ manufacturer: conf.manufacturer, baud: 115200 });
+      if(!conf.baud){ conf.baud = 115200}
+
+      parser.setup(conf);
+      //if (conf.name) parser.setup({ name: conf.name, baud: 115200 });
+      //else if (conf.manufacturer) parser.setup({ manufacturer: conf.manufacturer, baud: 115200 });
 
     }
 

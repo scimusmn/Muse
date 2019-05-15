@@ -23,7 +23,7 @@ obtain(['serialport'], (com)=> {
     };
 
     _this.send = (arr) => {
-      if (_this.isOpen) ser.write(new Buffer(arr));
+      if (_this.isOpen) ser.write(Buffer.from(arr));
     };
 
     var openByName = (portName, baud) => {
@@ -61,10 +61,10 @@ obtain(['serialport'], (com)=> {
       var name = null;
       com.list(function (err, ports) {
         ports.forEach(function (port) {
-          //console.log(port);
+          console.log(port);
           if (port.comName.includes(props.name) ||
               (port.manufacturer && props.manufacturer &&
-              port.manufacturer.toLowerCase() == props.manufacturer.toLowerCase()) ||
+              port.manufacturer.toLowerCase().includes(props.manufacturer.toLowerCase())) ||
               (port.serialNumber && port.serialNumber == props.serialNumber)
             ) name = port.comName;
         });

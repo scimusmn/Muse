@@ -67,7 +67,7 @@ obtain([`${__dirname}/express.js`, 'ws', 'url', 'µ//events.js'], ({ http, https
     };
 
     wsServer.on('connection', function (ws, req) {
-      //console.log('client connected');
+      console.log('client connected');
       if (!req && ws.upgradeReq) req = ws.upgradeReq;
 
       ws.id = req.session.id;
@@ -79,10 +79,6 @@ obtain([`${__dirname}/express.js`, 'ws', 'url', 'µ//events.js'], ({ http, https
       };
 
       //wsServer.onClientConnect(ws, req);
-      manager.emit('clientConnect', {
-        ws: ws,
-        req: req,
-      });
 
       ws.sendObject = (obj)=> {
         ws.send(JSON.stringify(obj));
@@ -116,6 +112,11 @@ obtain([`${__dirname}/express.js`, 'ws', 'url', 'µ//events.js'], ({ http, https
       });
 
       ws.on('error', function (error) {
+      });
+
+      manager.emit('clientConnect', {
+        ws: ws,
+        req: req,
       });
     });
 

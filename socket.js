@@ -6,7 +6,7 @@ obtain(['µ/events.js'], ({ Emitter })=> {
   }
 
   class SingleSocket extends Emitter {
-    constructor(addr) {
+    constructor(addr, auto = true) {
       super();
 
       this.cnxnInterval = null;
@@ -15,7 +15,7 @@ obtain(['µ/events.js'], ({ Emitter })=> {
 
       this.address = addr;
 
-      //this.connect(addr);
+      if (auto) this.connect(addr);
     }
 
     synchronize () {
